@@ -17,6 +17,7 @@ class Optimizer:
         if self.rf.nb_classes == 2:
             for index, row in self.dataset.iterrows():
                 original_rf_class = self.rf.rf_decision(row)
+                print(original_rf_class)
                 constraints.append([[[f"u{i}" for i in range(self.rf.nb_trees)],
                                      [self.rf.tree_fun(row, self.rf.trees[i], original_rf_class) - self.rf.tree_fun(row,
                                                                                                                     self.rf.trees[
@@ -26,7 +27,7 @@ class Optimizer:
         else:
             for index, row in self.dataset.iterrows():
                 original_rf_class = self.rf.rf_decision(row)
-                for c in self.rf.nb_classes:
+                for c in range(self.rf.nb_classes):
                     constraints.append([[[f"u{i}" for i in range(self.rf.nb_trees)],
                                          [self.rf.tree_fun(row, self.rf.trees[i], original_rf_class) - self.rf.tree_fun(
                                              row,
