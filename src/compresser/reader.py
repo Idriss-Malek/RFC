@@ -4,7 +4,7 @@ import numpy as np
 class Reader:
     def __init__(self, rf_file):
         self.rf_file = rf_file
-        trees = []
+        self.trees = []
         with open(self.rf_file, 'r') as f:
             self.dataset = f.readline().split()[1]
             next(f)
@@ -17,27 +17,34 @@ class Reader:
 
             for line in f:
                 if line[0] in numbers:
-                    trees[-1].append(line.strip())
-                    trees[-1][-1][5] = float(trees[-1][-1][5])
+                    self.trees[-1].append(line.strip())
+                    self.trees[-1][-1][5] = float(self.trees[-1][-1][5])
                     for i in range(8):
                         if i != 1 and i != 5:
-                            trees[-1][-1][i] = int(trees[-1][-1][i])
+                            self.trees[-1][-1][i] = int(self.trees[-1][-1][i])
                 if '[TREE' in line:
-                    trees.append([])
+                    self.trees.append([])
                 else:
                     next(f)
 
-        def aux(x):
-            tree_results = np.empty(self.nb_trees)
-            for i in range(self.nb_trees):
-                node = trees[i][0]
-                while node[1] == 'IN':
-                    if x[node[4]] <= node[5]:
-                        node = trees[i][node[2]]
-                    else:
-                        node = trees[i][node[3]]
-                tree_results[i] = node[-1]
-            return np.argmax(np.bincount(tree_results))
+    def tree_fun(self, x, tree, c):
+        node = tree[0]
+        while node[1] == 'IN':
+            if x[node[4]] <= node[5]:
+                node = tree[node[2]]
+            else:
+                node = tree[node[3]]
+        return c == node[-1] + 1.
 
-        self.fun = aux
+    def rf_fun(self, x, c):
+        tree_results = np.empty(self.nb_trees)
+        for i in range(self.nb_trees):
+            tree_results[i] = self.tree_fun(x, self.trees[i], c)
+        return np.mean(tree_results)
 
+    def rf_decision(self, x, array=None):
+        if array=None:
+            array = np.empty(self.nb_classes)
+        for c in range(self.nb_classes):
+            array[c] = self.rf_fun(x, c)
+        return np.argmax(array)

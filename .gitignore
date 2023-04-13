@@ -128,3 +128,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#special
+src/compresser/**/*.ipynb
+cplex_test.ipynb
