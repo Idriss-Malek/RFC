@@ -13,9 +13,10 @@ class Optimizer:
         u = model.variables.add(names=[f"u{i}" for i in range(self.rf.nb_trees)],
                                 types=[model.variables.type.binary for i in range(self.rf.nb_trees)])
         constraints = []
-        original_rf_class = self.rf.rf_decision(x)
+
         if self.rf.nb_classes == 2:
             for index, row in self.dataset.iterrows():
+                original_rf_class = self.rf.rf_decision(row)
                 constraints.append([[[f"u{i}" for i in range(self.rf.nb_trees)],
                                      [self.rf.tree_fun(row, self.rf.trees[i], original_rf_class) - self.rf.tree_fun(row,
                                                                                                                     self.rf.trees[
@@ -24,6 +25,7 @@ class Optimizer:
                                       for i in range(self.rf.nb_trees)]], ">=", 0.0])
         else:
             for index, row in self.dataset.iterrows():
+                original_rf_class = self.rf.rf_decision(row)
                 for c in self.rf.nb_classes:
                     constraints.append([[[f"u{i}" for i in range(self.rf.nb_trees)],
                                          [self.rf.tree_fun(row, self.rf.trees[i], original_rf_class) - self.rf.tree_fun(
@@ -36,3 +38,10 @@ class Optimizer:
         model.objective.set_sense(model.objective.sense.minimize)
         model.objective.set_linear([(f"u{i}", 1.0) for i in range(self.rf.nb_trees)])
         model.solve()
+
+
+if __name__ == '__main__':
+    data = '../resources/datasets/Seeds/Seeds.train1.csv'
+    rf = '../resources/forests/Seeds/Seeds.RF1.txt'
+    optimizer = Optimizer(rf, data)
+    optimizer.opt()
