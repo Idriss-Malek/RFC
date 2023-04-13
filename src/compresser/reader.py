@@ -43,7 +43,7 @@ class Reader:
         return np.mean(tree_results)
 
     def rf_decision(self, x, array=None):
-        if array=None:
+        if array is None:
             array = np.empty(self.nb_classes)
         for c in range(self.nb_classes):
             array[c] = self.rf_fun(x, c)
