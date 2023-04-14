@@ -1,7 +1,7 @@
 from anytree import Node
 import numpy as np
 
-def tree_ensemble_fun(trees:'list[list[Node]]', x:list, c: int):
+def tree_ensemble_fun(trees, x, c):
     '''
     The tree ensemble is a list of trees.
     Each tree is a list of nodes.

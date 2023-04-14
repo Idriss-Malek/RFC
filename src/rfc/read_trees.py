@@ -10,12 +10,8 @@ This file is meant to put the random forest that are available in the resources 
 def read_trees(file:str):
     trees = []
     with open(file, 'r') as f:
-            next(f)
-            next(f)
-            nb_trees= int(f.readline().split()[1])
-            nb_features = int(f.readline().split()[1])
-            nb_classes = int(f.readline().split()[1])
-            next(f)
+            for _ in range (6):
+                next(f)
             numbers = [str(i) for i in range(10)]
             for line in f:
                 if line[0] in numbers:
@@ -33,6 +29,12 @@ def read_trees(file:str):
                     parents={}
     return trees
 
+def nb_classes_fun(file:str):
+    with open(file, 'r') as f:
+        for _ in range (4):
+            next(f)
+        nb_classes = int(f.readline().split()[1])
+    return nb_classes
 
 if __name__ == '__main__':
     rf = './resources/forests/Seeds/Seeds.RF1.txt'
