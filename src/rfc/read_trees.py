@@ -2,6 +2,11 @@ import numpy as np
 import pandas as pd
 from anytree import Node
 
+
+'''
+This file is meant to put the random forest that are available in the resources folder to the right format.
+'''
+
 def read_trees(file:str):
     trees = []
     with open(file, 'r') as f:
