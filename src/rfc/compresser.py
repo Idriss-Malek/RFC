@@ -18,24 +18,33 @@ def compress(
     model = cplex.Cplex()
     u = model.variables.add(names=[f"u{t}" for t in range(nb_trees)],types=[model.variables.type.binary for t in range(nb_trees)])
     constraints = []
+    rhs=[]
+    senses=[]
     for index, row in train.iterrows():
-        results=np.empty(nb_classes,nb_trees)
+        results=np.empty([nb_classes,nb_trees])
         probs=np.empty(nb_classes)
         for c in range (nb_classes):
             results[c]=tree_ensemble_fun(trees,row,c)
         probs=results.mean(axis=1)
         original_rf_class=np.argmax(probs)
         if nb_classes == 2:
-            constraints.append([[[f"u{t}" for t in range(nb_trees)],
-                                    [weights[t]*(results[original_rf_class,t] -results[1-original_rf_class,t]) for t in range(nb_trees)]], ">=", 0.0])
+            constraints.append([[u[t] for t in range(nb_trees)],
+                                    [weights[t]*(results[original_rf_class,t] -results[1-original_rf_class,t]) for t in range(nb_trees)]])
+            senses.append('G')
+            rhs.append('0.0')
         else:
             for c in range(nb_classes):
                 if c!=original_rf_class:
-                    constraints.append([[[f"u{t}" for t in range(nb_trees)],
-                                    [weights[t]*(results[original_rf_class,t] -results[c,t]) for t in range(nb_trees)]], ">=", 0.0])
-    model.linear_constraints.add(lin_expr=constraints)
+                    constraints.append([[u[t] for t in range(nb_trees)],
+                                    [weights[t]*(results[original_rf_class,t] -results[c,t]) for t in range(nb_trees)]])
+                    senses.append('G')
+                    rhs.append('0.0')
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    print(constraints[0])
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    model.linear_constraints.add(lin_expr=constraints,senses = senses,rhs = rhs)
     model.objective.set_sense(model.objective.sense.minimize)
-    model.objective.set_linear([(f"u{t}", 1.0) for t in range(nb_trees)])
+    model.objective.set_linear([(u[t], 1.0) for t in range(nb_trees)])
     model.solve()
 
 
