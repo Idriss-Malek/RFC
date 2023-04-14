@@ -17,10 +17,10 @@ def read_trees(file:str):
                     row=line.split()
                     node = Node(int(row[0]), feature=int(row[4]), thr=float(row[5]), klass=int(row[7]))
                     if node.name in parents: # type: ignore
-                        node.par = parents[node.name] # type: ignore
+                        node.parent = parents[node.name] # type: ignore
                     if int(row[2])>=0:
-                        parents[int(row[2])]=node.name # type: ignore
-                        parents[int(row[3])]=node.name # type: ignore
+                        parents[int(row[2])]=node # type: ignore
+                        parents[int(row[3])]=node # type: ignore
                     trees[-1].append(node)
                     
                 if '[TREE' in line:
