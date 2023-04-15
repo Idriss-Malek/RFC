@@ -6,8 +6,8 @@ import numpy as np
 
 if __name__ == '__main__':
     current_file=str(__file__)
-    data = current_file[:-15]+'resources/datasets/Seeds/Seeds.train1.csv'
-    rf = current_file[:-15]+'resources/forests/Seeds/Seeds.RF1.txt'
+    data = current_file[:-15]+'resources/datasets/Breast-Cancer-Wisconsin/Breast-Cancer-Wisconsin.full.csv'
+    rf = current_file[:-15]+'resources/forests/Breast-Cancer-Wisconsin/Breast-Cancer-Wisconsin.RF8.txt'
     dataset=pd.read_csv(data)
     trees=read_trees(rf)
     nb_classes=nb_classes_fun(rf)
@@ -15,6 +15,8 @@ if __name__ == '__main__':
     u=compress(trees,dataset,nb_classes)
     new_trees=[trees[t] for t in range(len(trees)) if u[t]==1.0]
     new_nb_trees=len(new_trees)
+    print(f'ORIGINAL TREE ENSEMBLE CONTAINS {nb_trees} TREES.')
+    print(f'COMPRESSED TREE ENSEMBLE CONTAINS {new_nb_trees} TREES.')
     for index, row in dataset.iterrows():
         results=np.empty([nb_classes,nb_trees])
         probs=np.empty(nb_classes)
