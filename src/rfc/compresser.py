@@ -31,7 +31,7 @@ def compress(
             constraints.append([[u[t] for t in range(nb_trees)],
                                     [weights[t]*(results[original_rf_class,t] -results[1-original_rf_class,t]) for t in range(nb_trees)]])
             senses.append('G')
-            rhs.append('0.0')
+            rhs.append(0.)
         else:
             for c in range(nb_classes):
                 if c!=original_rf_class:
@@ -39,11 +39,13 @@ def compress(
                                     [weights[t]*(results[original_rf_class,t] -results[c,t]) for t in range(nb_trees)]])
                     senses.append('G')
                     rhs.append(0.)
-    
+    constraints.append([[u[t] for t in range(nb_trees)],[1 for t in range(nb_trees)]])
+    senses.append('G')
+    rhs.append(1.)
     model.linear_constraints.add(lin_expr=constraints,senses = senses,rhs = rhs)
     model.objective.set_sense(model.objective.sense.minimize)
     model.objective.set_linear([(u[t], 1.0) for t in range(nb_trees)])
     model.solve()
-    print(model.solution.get_values())
+    return model.solution.get_values()
 
 
