@@ -19,12 +19,8 @@ if __name__ == '__main__':
             nb_classes=nb_classes_fun(rf)
             nb_trees=len(trees)
             u,t=compress(trees,dataset,nb_classes)
-            print(t/10**9)
-            ff
             new_trees=[trees[t] for t in range(len(trees)) if u[t]==1.0]
             new_nb_trees=len(new_trees)
-            print(f'ORIGINAL TREE ENSEMBLE CONTAINS {nb_trees} TREES.')
-            print(f'COMPRESSED TREE ENSEMBLE CONTAINS {new_nb_trees} TREES.')
             for index, row in dataset.iterrows():
                 results=np.empty([nb_classes,nb_trees])
                 probs=np.empty(nb_classes)
@@ -39,10 +35,8 @@ if __name__ == '__main__':
                 new_probs=results.mean(axis=1)
                 new__rf_class=np.argmax(new_probs)
                 if original_rf_class!=new__rf_class:
-                    print('LOSSLESS COMPRESSION FAILED')
                     lossless_compression=False
                     break
-            print('LOSSLESS COMPRESSION SUCCEEDED')
             row={'Dataset':subdir+'.train'+str(rf)+'.csv','Random Forest':subdir+'.RF'+str(rf)+'.txt','Original size':nb_trees ,'Compressed size':new_nb_trees,'Compression time':f'{t/10**9}s', 'Compression is lossless':lossless_compression}
             df.append(row, ignore_index=True)
     df.to_csv('results.csv', index=False)
