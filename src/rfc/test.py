@@ -19,7 +19,7 @@ if __name__ == '__main__':
             nb_classes=nb_classes_fun(rf)
             nb_trees=len(trees)
             u,t=compress(trees,dataset,nb_classes)
-            new_trees=[trees[t] for t in range(len(trees)) if u[t]==1.0]
+            new_trees=[trees[t] for t in range(len(trees)) if u[t]>=0.5]
             new_nb_trees=len(new_trees)
             for index, row in dataset.iterrows():
                 results=np.empty([nb_classes,nb_trees])
