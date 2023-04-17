@@ -38,6 +38,6 @@ if __name__ == '__main__':
                     lossless_compression=False
                     break
             row={'Dataset':subdir+'.train'+str(rf)+'.csv','Random Forest':subdir+'.RF'+str(rf)+'.txt','Original size':nb_trees ,'Compressed size':new_nb_trees,'Compression time':f'{t/10**9}s', 'Compression is lossless':lossless_compression}
-            df.append(row, ignore_index=True)
+            df=df._append(row, ignore_index=True)
     df.to_csv('results.csv', index=False)
 
