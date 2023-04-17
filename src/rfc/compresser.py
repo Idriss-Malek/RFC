@@ -4,6 +4,7 @@ import numpy as np
 from anytree import Node
 from typing import Any
 from tree_ensemble_function import tree_ensemble_fun
+import time
 
 def compress(
     trees,
@@ -45,7 +46,9 @@ def compress(
     model.linear_constraints.add(lin_expr=constraints,senses = senses,rhs = rhs)
     model.objective.set_sense(model.objective.sense.minimize)
     model.objective.set_linear([(u[t], 1.0) for t in range(nb_trees)])
+    t1=time.perf_counter_ns()
     model.solve()
-    return model.solution.get_values()
+    t2=time.perf_counter_ns()-t1
+    return model.solution.get_values(),t2
 
 
