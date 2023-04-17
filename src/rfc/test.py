@@ -10,7 +10,7 @@ if __name__ == '__main__':
     data_dir = [f.name for f in os.scandir(current_file[:-15]+'resources/datasets') if f.is_dir()]
     rf_dir=[f.name for f in os.scandir(current_file[:-15]+'resources/forests') if f.is_dir()]
     for subdir in data_dir:
-        for rf in range(1,11):
+        for i in range(1,11):
             lossless_compression=True
             data = current_file[:-15]+'resources/datasets/'+subdir+'/'+subdir+'.train'+str(rf)+'.csv'
             rf = current_file[:-15]+'resources/forests/'+subdir+'/'+subdir+'.RF'+str(rf)+'.txt'
@@ -37,7 +37,7 @@ if __name__ == '__main__':
                 if original_rf_class!=new__rf_class:
                     lossless_compression=False
                     break
-            row={'Dataset':subdir+'.train'+str(rf)+'.csv','Random Forest':subdir+'.RF'+str(rf)+'.txt','Original size':nb_trees ,'Compressed size':new_nb_trees,'Compression time':f'{t/10**9}s', 'Compression is lossless':lossless_compression}
+            row={'Dataset':subdir+'.train'+str(i)+'.csv','Random Forest':subdir+'.RF'+str(i)+'.txt','Original size':nb_trees ,'Compressed size':new_nb_trees,'Compression time':f'{t/10**9}s', 'Compression is lossless':lossless_compression}
             df=df._append(row, ignore_index=True)
     df.to_csv('results.csv', index=False)
 
