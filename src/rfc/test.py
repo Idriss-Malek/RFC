@@ -33,8 +33,8 @@ if __name__ == '__main__':
                 for c in range (nb_classes):
                     new_results[c]=tree_ensemble_fun(new_trees,row,c)
                 new_probs=results.mean(axis=1)
-                new__rf_class=np.argmax(new_probs)
-                if original_rf_class!=new__rf_class:
+                new_rf_class=np.argmax(new_probs)
+                if original_rf_class!=new_rf_class:
                     lossless_compression=False
                     break
             row={'Dataset':subdir+'.train'+str(i)+'.csv','Random Forest':subdir+'.RF'+str(i)+'.txt','Original size':nb_trees ,'Compressed size':new_nb_trees,'Compression time':f'{t/10**9}s', 'Compression is lossless':lossless_compression}
