@@ -18,6 +18,7 @@ def compress(
         weights = np.ones(len(trees))
     model = cplex.Cplex()
     u = model.variables.add(names=[f"u{t}" for t in range(nb_trees)],types=[model.variables.type.binary for t in range(nb_trees)])
+    print(u)
     constraints = []
     rhs=[]
     senses=[]
