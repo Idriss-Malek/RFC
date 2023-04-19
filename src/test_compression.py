@@ -7,13 +7,13 @@ import os
 df=pd.DataFrame(columns=['Dataset','Random Forest', 'Original size','Compressed size','Compression time', 'Compression is lossless'])
 if __name__ == '__main__':
     current_file=str(__file__)
-    data_dir = [f.name for f in os.scandir(current_file[:-15]+'resources/datasets') if f.is_dir()]
-    rf_dir=[f.name for f in os.scandir(current_file[:-15]+'resources/forests') if f.is_dir()]
+    data_dir = [f.name for f in os.scandir(current_file[:-23]+'resources/datasets') if f.is_dir()]
+    rf_dir=[f.name for f in os.scandir(current_file[:-23]+'resources/forests') if f.is_dir()]
     for subdir in data_dir:
         for i in range(1,11):
             lossless_compression=True
-            data = current_file[:-11]+'resources/datasets/'+subdir+'/'+subdir+'.train'+str(i)+'.csv'
-            rf = current_file[:-11]+'resources/forests/'+subdir+'/'+subdir+'.RF'+str(i)+'.txt'
+            data = current_file[:-23]+'resources/datasets/'+subdir+'/'+subdir+'.train'+str(i)+'.csv'
+            rf = current_file[:-23]+'resources/forests/'+subdir+'/'+subdir+'.RF'+str(i)+'.txt'
             dataset=pd.read_csv(data)
             trees=read_trees(rf)
             nb_classes=nb_classes_fun(rf)

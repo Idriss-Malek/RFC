@@ -19,7 +19,7 @@ def find(original, compressed, c, weights=None):
 
 if __name__ == '__main__':
     current_file=str(__file__)
-    rf = read_trees(current_file[:-15]+'resources/forests/FICO/FICO.RF1.txt')
+    rf = read_trees(current_file[:-11]+'resources/forests/FICO/FICO.RF1.txt')
     model=find(rf,rf,0)
     print(len(rf[0]))
     print(model.variables.get_names())
