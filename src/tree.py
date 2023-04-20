@@ -102,6 +102,10 @@ class TreeEnsemble:
         self.n_classes = n_classes
         self.n_features = n_features
         self.m_depth = m_depth
+        self.bin = None
+        self.cat = None
+        self.num = None
+        self.num_nb = None
         if trees is None:
             self.trees = []
         else:
