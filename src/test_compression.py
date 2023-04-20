@@ -16,6 +16,7 @@ if __name__ == '__main__':
             rf = current_file[:-23]+'resources/forests/'+subdir+'/'+subdir+'.RF'+str(i)+'.txt'
             dataset=pd.read_csv(data)
             trees=read_trees(rf)
+
             nb_classes=nb_classes_fun(rf)
             nb_trees=len(trees)
             u,t=compress(trees,dataset,nb_classes)
