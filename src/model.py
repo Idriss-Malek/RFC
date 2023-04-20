@@ -2,7 +2,10 @@ import pandas as pd
 import numpy as np
 import docplex.mp.model as cpx
 
+from anytree import PreOrderIter
 from tree import *
+
+epsilon = 1e-10
 
 def addU(
     mdl: cpx.Model,
@@ -61,18 +64,83 @@ def addY(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
 ):
+    keys = []
+    for t, tree in enumerate(ensemble.trees):
+        for node in PreOrderIter(tree.root):
+            keys.append((t, node.name))
+    mdl.var_dict(keys, lb=0, ub=1, name='y') # type: ignore
+
+def addLambda(
+    mdl: cpx.Model,
+    ensemble: TreeEnsemble
+):
+    keys = []
+    for t, tree in enumerate(ensemble.trees):
+        md = tree.root.height
+        for d in range(md):
+            keys.append((t, d))
+    mdl.binary_var_dict(keys, name='lambda') # type: ignore
+
+def addMu(
+    mdl: cpx.Model,
+    ensemble: TreeEnsemble
+):
     pass
 
-def addLambda(mdl: cpx.Model, ensemble: TreeEnsemble):
+def addNu(
+    mdl: cpx.Model,
+    ensemble: TreeEnsemble
+):
     pass
 
-def addX(mdl: cpx.Model, ensemble: TreeEnsemble):
+def addX(
+    mdl: cpx.Model,
+    ensemble: TreeEnsemble
+):
     pass
 
 def addZ(mdl: cpx.Model, ensemble: TreeEnsemble):
     pass
 
 def addZeta(mdl: cpx.Model, ensemble: TreeEnsemble):
+    pass
+
+def addBaseCons(
+    mdl: cpx.Model,
+    ensemble: TreeEnsemble
+):
+    y = mdl.find_matching_vars('y')
+    lam = mdl.find_matching_vars('lambda')
+    for t, tree in enumerate(ensemble.trees):
+        mdl.add_constraint_(y[(t, tree.root.name)] == 1) # type: ignore
+        for node in PreOrderIter(tree.root):
+            if not node.is_leaf:
+                left = node.children[0]
+                right = node.children[1]
+                lhs = y[(t, node.name)] # type: ignore
+                rhs = y[(t, left.name)] + y[(t, right.name)] # type: ignore
+                mdl.add_constraint_(lhs == rhs)
+        md = tree.root.height
+        for d in range(md):
+            nodes = []
+            for node in PreOrderIter(tree.root):
+                if node.depth == d and not node.is_leaf:
+                    left = node.children[0]
+                    nodes.append(left)
+            lhs = mdl.sum(y[(t, node.name)] for node in nodes) # type: ignore
+            rhs = lam[(t, d)] # type: ignore
+            mdl.add_constraint_(lhs <= rhs)
+
+def addMuCons(
+    mdl: cpx.Model,
+    ensemble: TreeEnsemble
+):
+    pass
+
+def addXCons(
+    mdl: cpx.Model,
+    ensemble: TreeEnsemble
+):
     pass
 
 def getZeta(mdl: cpx.Model):
@@ -89,7 +157,14 @@ def buildBaseSepModel(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
 ):
-    pass
+    addY(mdl, ensemble)
+    addLambda(mdl, ensemble)
+    addBaseCons(mdl, ensemble)
+    addMu(mdl, ensemble)
+    addMuCons(mdl, ensemble)
+    # addNu(mdl, ensemble)
+    addX(mdl, ensemble)
+    addXCons(mdl, ensemble)
 
 def buildSepModel(
     mdl: cpx.Model,

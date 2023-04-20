@@ -76,7 +76,7 @@ class Tree:
 
     def getKlass(self, x: pd.Series):
         node = self.root
-        while node.klass == -1:
+        while node.is_leaf is False:
             if x[node.feature] <= node.thr:
                 node = node.children[0]
             else:
