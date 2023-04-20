@@ -10,23 +10,23 @@ if __name__ == '__main__':
     rf = current_file[:-15]+'resources/forests/Breast-Cancer-Wisconsin/Breast-Cancer-Wisconsin.RF8.txt'
     dataset=pd.read_csv(data)
     trees=read_trees(rf)
-    nb_classes=nb_classes_fun(rf)
-    nb_trees=len(trees)
-    u=compress(trees,dataset,nb_classes)
+    n_klasses=nb_classes_fun(rf)
+    n_trees=len(trees)
+    u=compress(trees,dataset,n_klasses)
     new_trees=[trees[t] for t in range(len(trees)) if u[t]==1.0]
     new_nb_trees=len(new_trees)
-    print(f'ORIGINAL TREE ENSEMBLE CONTAINS {nb_trees} TREES.')
+    print(f'ORIGINAL TREE ENSEMBLE CONTAINS {n_trees} TREES.')
     print(f'COMPRESSED TREE ENSEMBLE CONTAINS {new_nb_trees} TREES.')
     for index, row in dataset.iterrows():
-        results=np.empty([nb_classes,nb_trees])
-        probs=np.empty(nb_classes)
-        for c in range (nb_classes):
+        results=np.empty([n_klasses,n_trees])
+        probs=np.empty(n_klasses)
+        for c in range (n_klasses):
             results[c]=tree_ensemble_fun(trees,row,c)
         probs=results.mean(axis=1)
         original_rf_class=np.argmax(probs)
-        new_results=np.empty([nb_classes,new_nb_trees])
-        new_probs=np.empty(nb_classes)
-        for c in range (nb_classes):
+        new_results=np.empty([n_klasses,new_nb_trees])
+        new_probs=np.empty(n_klasses)
+        for c in range (n_klasses):
             new_results[c]=tree_ensemble_fun(new_trees,row,c)
         new_probs=results.mean(axis=1)
         new__rf_class=np.argmax(new_probs)
