@@ -113,8 +113,8 @@ def addZ(mdl: cpx.Model, ensemble: TreeEnsemble):
     keys=[c for c in range (ensemble.n_classes)]
     mdl.var_dict(keys,name='z')
 
-def addZeta(mdl: cpx.Model, ensemble: TreeEnsemble, klass:int, sep_class:int):
-    keys=[klass,sep_class]
+def addZeta(mdl: cpx.Model, ensemble: TreeEnsemble, c:int, cc:int):
+    keys=[c,cc]
     mdl.var_dict(keys,name='zeta')
 
 def addBaseCons(
@@ -191,6 +191,45 @@ def addNuCons(
                         mdl.add_constraint_(nu[(i,j)] >= y[(t,node.children[1])])
         mdl.add_constraint(sum(nu[(i,j)] for j in range(k)) == 1)
 '''
+def addZCons(
+        mdl: cpx.Model,
+        ensemble: TreeEnsemble,
+        c:int
+        ):
+    y = mdl.find_matching_vars('y')
+    z = mdl.find_matching_vars('z')
+    for klass in range(ensemble.nb_classes):
+        lhs= z[klass]
+        rhs=sum(ensemble.weights[t]*((node.klass==klass)+0.)*y[(t,node)] for t,tree in enumerate(ensemble.trees) for node in PreOrderIter(tree.root) if node.is_leaf)
+        mdl.add_constraint_(lhs == rhs)
+    for klass in range(ensemble.nb_classes):
+        if klass == c:
+            continue
+        mdl.add_constraints_(z[klass] <= z[c])
+
+def addZetaCons(
+        mdl: cpx.Model,
+        ensemble: TreeEnsemble,
+        u: np.ndarray,
+        c: int,
+        cc: int
+):
+    y = mdl.find_matching_vars('y')
+    zeta = mdl.find_matching_vars('zeta')
+    for klass in [c,cc]:
+        lhs= zeta[klass]
+        rhs=sum(u[t]*ensemble.weights[t]*((node.klass==klass)+0.)*y[(t,node)] for t,tree in enumerate(ensemble.trees) for node in PreOrderIter(tree.root) if node.is_leaf)
+        mdl.add_constraint_(lhs == rhs)
+
+def addObj(
+        mdl: cpx.Model,
+        ensemble: TreeEnsemble,
+        c: int,
+        cc: int
+):
+    zeta = mdl.find_matching_vars('zeta')
+    mdl.minimize(zeta[c] - zeta[cc])
+
 def getZeta(mdl: cpx.Model):
     zeta = mdl.find_matching_vars('zeta')
     z = np.empty(2)
@@ -215,6 +254,7 @@ def buildBaseSepModel(
     addX(mdl, ensemble)
     addXCons(mdl, ensemble)
 
+
 def buildSepModel(
     mdl: cpx.Model,
     ensemble: TreeEnsemble,
@@ -222,7 +262,13 @@ def buildSepModel(
     c: int,
     cc: int
 ):
-    pass
+    buildBaseSepModel(mdl,ensemble)
+    addZ(mdl,ensemble)
+    addZCons(mdl,ensemble)
+    addZeta(mdl,ensemble)
+    addZetaCons(mdl,ensemble,u,c,cc)
+    addObj(mdl,ensemble,c,cc)
+
 
 def separate(
     ensemble: TreeEnsemble,
