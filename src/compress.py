@@ -6,18 +6,18 @@ from tree import *
 
 def check_klass(
     ensemble: TreeEnsemble,
-    u: list[int],
+    u: np.ndarray,
     x: pd.Series,
 ) -> bool:
     w = ensemble.weigths
-    wu = np.array(u) * w
+    wu = u * w
     F = ensemble.getF(x)
     c = np.argmax(F.dot(w))
-    return F.dot(wu)[c] == max(F.dot(wu))
+    return F.dot(wu)[c] == max(F.dot(wu)) # type: ignore
 
 def check(
     ensemble: TreeEnsemble,
-    u: list[int],
+    u: np.ndarray,
     dataset: pd.DataFrame
 ) -> bool:
     for _, x in dataset.iterrows():
@@ -52,34 +52,41 @@ def compress(
     if on not in ['train', 'full']:
         raise ValueError('on must be either "train" or "full"')
 
-    with cpx.Model(
+    mdl = cpx.Model(
         name="Compression",
         log_output=log_output,
         float_precision=precision
-    ) as mdl:
-        buildModel(mdl, ensemble, dataset)
-        mdl.print_information()
-        u = None
-        while True:
-            sol = mdl.solve()
-            if sol:
-                if log_output: mdl.report()
-                u = getSolution(mdl)
-                if on == 'train':
+    )
+    buildModel(mdl, ensemble, dataset)
+    if log_output: mdl.print_information()
+    u = None
+    sep = None
+    while True:
+        sol = mdl.solve()
+        if sol:
+            if log_output: mdl.report()
+            u = getU(mdl)
+            if on == 'train':
+                return u
+            elif on == 'full':
+                if sep is None:
+                    sep = cpx.Model(
+                        name="Separation",
+                        log_output=log_output,
+                        float_precision=precision
+                    )
+                    buildBaseSepModel(sep, ensemble)
+                if sum(u) == len(ensemble.trees):
                     return u
-                elif on == 'full':
-                    if sum(u) == len(ensemble.trees):
+                else:
+                    xs = separate(ensemble, u, baseSep=sep)
+                    if xs == []:
                         return u
                     else:
-                        xs = separate(ensemble, u)
-                        if xs == []:
-                            return u
-                        else:
-                            for x in xs:
-                                setConstraints(mdl, ensemble, x)             
-            else:
-                print('No solution found.')
-                return None
+                        for x in xs:
+                            addCons(mdl, ensemble, x)             
+        else:
+            return u
 
 # Example     
 if __name__ == '__main__':
@@ -92,7 +99,9 @@ if __name__ == '__main__':
     ensemble = str(ensemble)
     ensemble = TreeEnsemble.from_file(ensemble)
     u = compress(ensemble, dataset, on='train', log_output=True)
-    if check(ensemble, u, dataset):
+    if u is None:
+        print('Solver did not find any solution.')
+    elif check(ensemble, u, dataset):
         print('Compression successful.')
     else:
         print('Compression failed.')

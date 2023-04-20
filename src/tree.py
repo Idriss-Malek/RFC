@@ -45,15 +45,15 @@ class Tree:
         self.n_nodes = n_nodes
 
     @classmethod
-    def from_lines(cls, lines: list[str]):
+    def from_lines(cls, lines: list[str], start: int = 0):
         assert ('[TREE' in lines[0])
         name = 'tree'
         root = None
-        n_nodes = int(lines[1].split(': ')[1])
+        n_nodes = int(lines[start + 1].split(': ')[1])
         parents = {}
         n = 0
         while n < n_nodes:
-            line = lines[n + 2]
+            line = lines[n + start + 2]
             idx, ntype, left, right, feature, thr, _, klass = line.split()
             feature = int(feature)
             thr = float(thr)
@@ -72,7 +72,7 @@ class Tree:
                 parents[left] = node
                 parents[right] = node
             n += 1
-        return cls(name, root, n_nodes)
+        return cls(name, root, n_nodes) # type: ignore
 
     def getKlass(self, x: pd.Series):
         node = self.root
@@ -124,10 +124,9 @@ class TreeEnsemble:
         lineIdx = 8
         trees = []
         while t < n_trees:
-            n_nodes = int(lines[lineIdx + 1].split(': ')[1])
             tree = Tree.from_lines(lines[lineIdx:])
             trees.append(tree)
-            lineIdx += (n_nodes + 3)
+            lineIdx += (tree.n_nodes + 3)
             t += 1
         return cls(
             dataset=dataset,
