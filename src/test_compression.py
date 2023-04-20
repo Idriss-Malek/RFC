@@ -1,4 +1,4 @@
-from compresser import compress
+from compress import compress
 from read_trees import nb_classes_fun, read_trees
 import pandas as pd
 from tree_ensemble_function import tree_ensemble_fun

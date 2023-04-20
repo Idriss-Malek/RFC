@@ -7,6 +7,10 @@ class BaseNode(object):
     pass
 
 class TreeNode(BaseNode, NodeMixin):
+    feature: int
+    thr: float
+    klass: int
+
     def __init__(
         self,
         name,
@@ -26,16 +30,24 @@ class TreeNode(BaseNode, NodeMixin):
             self.children = children
 
 class Tree:
+    name: str
     root: TreeNode
     n_nodes: int
 
-    def __init__(self, root: TreeNode, n_nodes: int) -> None:
+    def __init__(
+        self,
+        name: str,
+        root: TreeNode,
+        n_nodes: int
+    ) -> None:
+        self.name = name
         self.root = root
         self.n_nodes = n_nodes
 
     @classmethod
     def from_lines(cls, lines: list[str]):
         assert ('[TREE' in lines[0])
+        name = 'tree'
         root = None
         n_nodes = int(lines[1].split(': ')[1])
         parents = {}
@@ -60,9 +72,9 @@ class Tree:
                 parents[left] = node
                 parents[right] = node
             n += 1
-        return cls(root, n_nodes)
+        return cls(name, root, n_nodes)
 
-    def getClass(self, x: pd.Series):
+    def getKlass(self, x: pd.Series):
         node = self.root
         while node.klass == -1:
             if x[node.feature] <= node.thr:
@@ -72,7 +84,7 @@ class Tree:
         return node.klass
 
     def getF(self, x: pd.Series, c: int):
-        return 1.0 if self.getClass(x) == c else 0.0
+        return 1.0 if self.getKlass(x) == c else 0.0
 
 class TreeEnsemble:
     def __init__(
@@ -102,7 +114,6 @@ class TreeEnsemble:
         with open(file, 'r') as f:
             lines = f.readlines()
             f.close()
-
         dataset = lines[0].split(': ')[1]
         etype = lines[1].split(': ')[1]
         n_trees = int(lines[2].split(': ')[1])
@@ -127,3 +138,9 @@ class TreeEnsemble:
             trees=trees
         )
     
+    def getF(self, x: pd.Series):
+        F = np.empty((self.n_classes, len(self.trees)))
+        for c in range(self.n_classes):
+            for t in range(len(self.trees)):
+                F[c, t] = self.trees[t].getF(x, c)
+        return F
