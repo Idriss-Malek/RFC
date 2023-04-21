@@ -90,7 +90,7 @@ def addMu(
         k = len(levels) - 2
         for j in range(k+1):
             keys.append((f, j))
-    mdl.var_dict(keys, lb=0, ub=1, name='mu',vartype=docplex.mp.constant.VarType.CONTINUOUS)
+    mdl.var_dict(keys, lb=0, ub=1, name='mu',vartype=cpx.mp.constant.VarType.CONTINUOUS)
 
 def addNu(
     mdl: cpx.Model,
@@ -117,8 +117,6 @@ def addBaseCons(
     y = mdl.find_matching_vars('y')
     lam = mdl.find_matching_vars('lambda')
     for t, tree in enumerate(ensemble.trees):
-        print(y[0].names)
-        exit()
         mdl.add_constraint_(y[(t, tree.root.name)] == 1) # type: ignore
         for node in PreOrderIter(tree.root):
             if not node.is_leaf:
@@ -163,14 +161,14 @@ def addMuCons(
 def addXCons(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
-):
+    ):
     y = mdl.find_matching_vars('y')
     x = mdl.find_matching_vars('x')
     mu = mdl.find_matching_vars('mu')
     for f in ensemble.bin:
         for t,tree in enumerate(ensemble.trees):
             for node in PreOrderIter(tree.root):
-                if not node.is_leaf and node.feature==i:
+                if not node.is_leaf and node.feature == f:
                     left = node.children[0]
                     right = node.children[1]
                     mdl.add_constraint_(x[f] <= 1 - y[(t,left)])
