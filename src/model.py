@@ -68,7 +68,7 @@ def addY(
     for t, tree in enumerate(ensemble.trees):
         for node in PreOrderIter(tree.root):
             keys.append((t, node.name))
-    mdl.var_dict(keys, lb=0, ub=1, name='y') # type: ignore
+    mdl.continuous_var_dict(keys, lb=0, ub=1, name='y') # type: ignore
 
 def addLambda(
     mdl: cpx.Model,
@@ -87,10 +87,10 @@ def addMu(
 ):
     keys = []
     for f, levels in ensemble.num_levels.items():
-        k = len(levels)
+        k = len(levels) - 2
         for j in range(k+1):
             keys.append((f, j))
-    mdl.var_dict(keys, lb=0, ub=1, name='mu')
+    mdl.var_dict(keys, lb=0, ub=1, name='mu',vartype=docplex.mp.constant.VarType.CONTINUOUS)
 
 def addNu(
     mdl: cpx.Model,
@@ -117,6 +117,8 @@ def addBaseCons(
     y = mdl.find_matching_vars('y')
     lam = mdl.find_matching_vars('lambda')
     for t, tree in enumerate(ensemble.trees):
+        print(y[0].names)
+        exit()
         mdl.add_constraint_(y[(t, tree.root.name)] == 1) # type: ignore
         for node in PreOrderIter(tree.root):
             if not node.is_leaf:
@@ -143,7 +145,7 @@ def addMuCons(
     y = mdl.find_matching_vars('y')
     mu = mdl.find_matching_vars('mu')
     for i, levels in ensemble.num_levels.items():
-        k = len(levels)
+        k = len(levels) - 2
         for j in range(1, k+1):
             mdl.add_constraint_(mu[(i, j-1)] >= mu[(i, j)])
             for t, tree in enumerate(ensemble.trees):
@@ -164,12 +166,19 @@ def addXCons(
 ):
     y = mdl.find_matching_vars('y')
     x = mdl.find_matching_vars('x')
-    for i in ensemble.bin:
+    mu = mdl.find_matching_vars('mu')
+    for f in ensemble.bin:
         for t,tree in enumerate(ensemble.trees):
             for node in PreOrderIter(tree.root):
                 if not node.is_leaf and node.feature==i:
-                    mdl.add_constraint_(x[i] <= 1 - y[(t,node.children[0])])
-                    mdl.add_constraint_(x[i] >= y[(t,node.children[1])])
+                    left = node.children[0]
+                    right = node.children[1]
+                    mdl.add_constraint_(x[f] <= 1 - y[(t,left)])
+                    mdl.add_constraint_(x[f] >= y[(t,right)])
+    for f,levels in ensemble.num_levels.items():
+        k = len(levels) - 2
+        rhs = sum( (levels[j+1] - levels[j])*mu[(f,j)] for j in range(k+1))
+        mdl.add_constraint_(x[f] == rhs)
 
 
 def addNuCons(
@@ -212,9 +221,9 @@ def addZetaCons(
 ):
     y = mdl.find_matching_vars('y')
     zeta = mdl.find_matching_vars('zeta')
-    for klass in [c,cc]:
-        lhs= zeta[klass]
-        rhs=sum(u[t]*ensemble.weights[t]*((node.klass==klass)+0.)*y[(t,node)] for t,tree in enumerate(ensemble.trees) for node in PreOrderIter(tree.root) if node.is_leaf)
+    for i in range(2):
+        lhs= zeta[i]
+        rhs=sum(u[t]*ensemble.weights[t]*((node.klass==[c,cc][i])+0.)*y[(t,node)] for t,tree in enumerate(ensemble.trees) for node in PreOrderIter(tree.root) if node.is_leaf)
         mdl.add_constraint_(lhs == rhs)
 
 def addObj(
@@ -224,7 +233,7 @@ def addObj(
         cc: int
 ):
     zeta = mdl.find_matching_vars('zeta')
-    mdl.minimize(zeta[c] - zeta[cc])
+    mdl.minimize(zeta[0] - zeta[1])
 
 def getZeta(mdl: cpx.Model):
     zeta = mdl.find_matching_vars('zeta')
@@ -297,11 +306,19 @@ def separate(
             sol = mdl.solve()
             if sol:
                 zeta = getZeta(mdl)
-                if zeta[0] - zeta[1] > 0:
-                    sols.append(getX(mdl))
-                    pass
+                if zeta[0] - zeta[1] < 0:
+                    return getX(mdl)
                 else:
                     pass
             else:
                 pass
-    return sols
+    print('LOSSLESS')
+
+if __name__ == '__main__':
+    import pathlib
+    root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
+    ensemble = root / 'forests/Breast-Cancer-Wisconsin/Breast-Cancer-Wisconsin.RF8.txt'
+    ensemble = str(ensemble)
+    ensemble = TreeEnsemble.from_file(ensemble)
+    x = separate(ensemble, [1.0]*10)
+    print(x)
