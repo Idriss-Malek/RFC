@@ -85,37 +85,30 @@ def addMu(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
 ):
-    keys=[]
-    for i,k in ensemble.num_nb.items():
+    keys = []
+    for f, levels in ensemble.num_levels.items():
+        k = len(levels)
         for j in range(k+1):
-            keys.append((i,j))
+            keys.append((f, j))
     mdl.var_dict(keys, lb=0, ub=1, name='mu')
-'''
+
 def addNu(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
 ):
-    keys=[]
-    for (i,k) in ensemble.cat.items():
-        for j in range(k):
-            keys.append((i,j))
-    mdl.binary_var_dict(keys,name='nu')
-'''
+    pass
 
 def addX(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
 ):
-    keys=[i for i in ensemble.bin]
-    mdl.binary_var_dict(keys,name='x')
+    mdl.binary_var_list(ensemble.n_features, name='x')
 
 def addZ(mdl: cpx.Model, ensemble: TreeEnsemble):
-    keys=[c for c in range (ensemble.n_classes)]
-    mdl.var_dict(keys,name='z')
+    mdl.var_list(ensemble.n_classes, name='z')
 
-def addZeta(mdl: cpx.Model, ensemble: TreeEnsemble, c:int, cc:int):
-    keys=[c,cc]
-    mdl.var_dict(keys,name='zeta')
+def addZeta(mdl: cpx.Model, ensemble: TreeEnsemble):
+    mdl.var_dict(2, name='zeta')
 
 def addBaseCons(
     mdl: cpx.Model,
@@ -149,15 +142,18 @@ def addMuCons(
 ):
     y = mdl.find_matching_vars('y')
     mu = mdl.find_matching_vars('mu')
-    for i,(name,k) in enumerate(ensemble.num_nb):
-        for j in range(1,k+1):
-            mdl.add_constraint_(mu[(i,j-1)] >= mu[(i,j)])
-            for t,tree in enumerate(ensemble.trees):
+    for i, levels in ensemble.num_levels.items():
+        k = len(levels)
+        for j in range(1, k+1):
+            mdl.add_constraint_(mu[(i, j-1)] >= mu[(i, j)])
+            for t, tree in enumerate(ensemble.trees):
                 for node in PreOrderIter(tree.root):
-                    if not node.is_leaf and node.feature==i and node.thr==ensemble.num[j]:
-                        mdl.add_constraint_(mu[(i,j)] <= 1 - y[(t,node.children[0])])
-                        mdl.add_constraint_(mu[((i,j-1))] >= y[(t,node.children[1])])
-                        mdl.add_constraint_(mu[(i,j)] <= epsilon * y[(t,node.children[1])])
+                    if not node.is_leaf and node.feature == i and node.thr == levels[j]:
+                        left = node.children[0]
+                        right = node.children[1]
+                        mdl.add_constraint_(mu[(i, j)] <= 1 - y[(t, left)])
+                        mdl.add_constraint_(mu[(i, j-1)] >= y[(t, right)])
+                        mdl.add_constraint_(mu[(i, j)] <= epsilon * y[(t, right)])
 
 
 
@@ -175,7 +171,7 @@ def addXCons(
                     mdl.add_constraint_(x[i] <= 1 - y[(t,node.children[0])])
                     mdl.add_constraint_(x[i] >= y[(t,node.children[1])])
 
-''' 
+
 def addNuCons(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
@@ -190,7 +186,7 @@ def addNuCons(
                         mdl.add_constraint_(nu[(i,j)] <= 1 - y[(t,node.children[0])])
                         mdl.add_constraint_(nu[(i,j)] >= y[(t,node.children[1])])
         mdl.add_constraint(sum(nu[(i,j)] for j in range(k)) == 1)
-'''
+
 def addZCons(
         mdl: cpx.Model,
         ensemble: TreeEnsemble,
@@ -249,10 +245,12 @@ def buildBaseSepModel(
     addBaseCons(mdl, ensemble)
     addMu(mdl, ensemble)
     addMuCons(mdl, ensemble)
-    #addNu(mdl, ensemble)
-    #addNuCOns(mdl,ensemble)
+    # addNu(mdl, ensemble)
+    # addNuCOns(mdl,ensemble)
     addX(mdl, ensemble)
     addXCons(mdl, ensemble)
+    addZ(mdl, ensemble)
+    addZCons(mdl, ensemble)
 
 
 def buildSepModel(
@@ -262,12 +260,9 @@ def buildSepModel(
     c: int,
     cc: int
 ):
-    buildBaseSepModel(mdl,ensemble)
-    addZ(mdl,ensemble)
-    addZCons(mdl,ensemble)
-    addZeta(mdl,ensemble)
+    addZeta(mdl, ensemble)
     addZetaCons(mdl,ensemble,u,c,cc)
-    addObj(mdl,ensemble,c,cc)
+    addObj(mdl, ensemble, c, cc)
 
 
 def separate(
@@ -286,19 +281,18 @@ def separate(
 
     sols = []
     if baseSep is None:
-        mdl = cpx.Model(
+        baseSep = cpx.Model(
             name="Separation",
             log_output=log_output,
             float_precision=precision
         )
-        buildBaseSepModel(mdl, ensemble)
-    else:
-        mdl = baseSep.clone()
+        buildBaseSepModel(baseSep, ensemble)
 
     for c in range(ensemble.n_classes):
         for cc in range(ensemble.n_classes):
             if cc == c:
                 continue
+            mdl = baseSep.clone()
             buildSepModel(mdl, ensemble, u, c, cc)
             sol = mdl.solve()
             if sol:

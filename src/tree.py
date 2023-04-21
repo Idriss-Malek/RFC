@@ -102,16 +102,14 @@ class TreeEnsemble:
         self.n_classes = n_classes
         self.n_features = n_features
         self.m_depth = m_depth
-        self.bin = None
-        self.cat = None
-        self.num = None
-        self.num_nb = None
         if trees is None:
             self.trees = []
         else:
             self.trees = trees
         if weigths is None:
             self.weigths = np.ones(len(self.trees))
+        
+        self.num_levels = self.getNumLevels() # type: dict[int, list[float]]
 
     @classmethod
     def from_file(cls, file: str):
@@ -147,3 +145,9 @@ class TreeEnsemble:
             for t in range(len(self.trees)):
                 F[c, t] = self.trees[t].getF(x, c)
         return F
+
+    def getNumLevels(self) -> dict[int, list[float]]:
+        res = {}
+        for f in range(self.n_features):
+            pass
+        return res
