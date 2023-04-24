@@ -1,5 +1,6 @@
 import pandas as pd
 import docplex.mp.model as cpx
+import pathlib
 
 from model import *
 from tree import *
@@ -25,9 +26,22 @@ def check(
             return False
     return True
 
+def checkRate(
+    ensemble: TreeEnsemble,
+    u: np.ndarray,
+    dataset: pd.DataFrame
+):
+    res=[]
+    for _, x in dataset.iterrows():
+        if checkKlass(ensemble, u, np.array(x.values)):
+            res.append(1)
+        else:
+            res.append(0)
+    
+    return sum(res)/len(res)
+
 # Example     
 if __name__ == '__main__':
-    import pathlib
     root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
     dataset = root / 'datasets/FICO/FICO.full.csv'
     ensemble = root / 'forests/FICO/FICO.RF1.txt'

@@ -6,6 +6,17 @@ NB_CLASSES: 2
 MAX_TREE_DEPTH: 4
 Format: node / node type (LN - leave node, IN - internal node) left child / right child / feature / threshold / node_depth / majority class (starts with index 0)
 
+[FEATURES] 
+Clump-T : D 1 2 3 4 5 6 7 8 9 10 
+Uniformity-Size : D 1 2 3 4 5 6 7 8 9 10 
+Uniformity-Shape : D 1 2 3 4 5 6 7 8 9 10 
+Adhesion : D 1 2 3 4 5 6 7 8 9 10 
+Cell-Size : D 1 2 3 4 5 6 7 8 9 10 
+Bare-Nuclei : D 1 2 3 4 5 6 7 8 9 10 
+Bland-Chromatin : D 1 2 3 4 5 6 7 8 9 10 
+Normal-Nucleoli : D 1 2 3 4 5 6 7 8 9 10 
+Mitoses : D 1 2 3 4 5 6 7 8 10 
+
 [TREE 0]
 NB_NODES: 25
 0 IN 1 12 5 2.5 0 -1
