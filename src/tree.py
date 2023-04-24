@@ -442,3 +442,10 @@ class TreeEnsemble(Iterable[Tree]):
 
     def __len__(self) -> int:
         return len(self.trees)
+
+if __name__ == '__main__':
+    import pathlib
+    root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
+    ensemble = root / 'forests/Breast-Cancer-Wisconsin/Breast-Cancer-Wisconsin.RF8.txt'
+    ensemble = str(ensemble)
+    ensemble = TreeEnsemble.from_file(ensemble)

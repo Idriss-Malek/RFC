@@ -3,6 +3,7 @@ import numpy as np
 import docplex.mp.model as cpx
 import docplex.mp.dvar as cpv
 
+from enum import Enum
 from tree import *
 
 epsilon = 1e-10
@@ -395,6 +396,13 @@ class TreeEnsembleSeparator:
                 self.clearModel()
         return res
 
+class TreeEnsembleCompressorStatus(Enum):
+    OPTIMAL = 'optimal'
+    INFEASIBLE = 'infeasible'
+    UNKNOWN = 'unknown'
+    MAX_ITERATIONS = 'max_iterations'
+    TIME_LIMIT = 'time_limit'
+
 class TreeEnsembleCompressor:
     dataset: pd.DataFrame
     ensemble: TreeEnsemble
@@ -402,7 +410,7 @@ class TreeEnsembleCompressor:
     sep: TreeEnsembleSeparator
     u: list[cpv.Var]
     sol: np.ndarray
-    status: str
+    status: TreeEnsembleCompressorStatus
 
     def __init__(
         self,
@@ -480,7 +488,7 @@ class TreeEnsembleCompressor:
         iteration = 0
         while True:
             if m_iterations is not None and iteration >= m_iterations:
-                self.status = 'max_iterations'
+                self.status = TreeEnsembleCompressorStatus.MAX_ITERATIONS
                 break        
             sol = self.mdl.solve()
             if sol:
@@ -489,7 +497,7 @@ class TreeEnsembleCompressor:
                 if self.mdl.objective_value == len(self.ensemble):
                     break
                 if on == 'train':
-                    self.status = 'optimal'
+                    self.status = TreeEnsembleCompressorStatus.OPTIMAL
                     break
                 elif on == 'full':
                     res = self.sep.separate(
@@ -498,13 +506,13 @@ class TreeEnsembleCompressor:
                         precision=precision
                     )
                     if len(res) == 0:
-                        self.status = 'optimal'
+                        self.status = TreeEnsembleCompressorStatus.OPTIMAL
                         break
                     else:
                         for x in res.values():
                             self.addUCons(x)
             else:
-                self.status = 'infeasible'
+                self.status = TreeEnsembleCompressorStatus.INFEASIBLE
                 break
             iteration += 1
 
