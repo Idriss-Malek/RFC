@@ -4,7 +4,7 @@ import docplex.mp.model as cpx
 from model import *
 from tree import *
 
-def check_klass(
+def checkKlass(
     ensemble: TreeEnsemble,
     u: np.ndarray,
     x: np.ndarray,
@@ -21,7 +21,7 @@ def check(
     dataset: pd.DataFrame
 ) -> bool:
     for _, x in dataset.iterrows():
-        if not check_klass(ensemble, u, np.array(x.values)):
+        if not checkKlass(ensemble, u, np.array(x.values)):
             return False
     return True
 
@@ -29,8 +29,8 @@ def check(
 if __name__ == '__main__':
     import pathlib
     root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
-    dataset = root / 'datasets/Breast-Cancer-Wisconsin/Breast-Cancer-Wisconsin.full.csv'
-    ensemble = root / 'forests/Breast-Cancer-Wisconsin/Breast-Cancer-Wisconsin.RF8.txt'
+    dataset = root / 'datasets/FICO/FICO.full.csv'
+    ensemble = root / 'forests/FICO/FICO.RF1.txt'
     dataset = str(dataset)
     dataset = pd.read_csv(dataset)
     ensemble = str(ensemble)
