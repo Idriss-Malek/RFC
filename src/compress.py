@@ -1,5 +1,6 @@
 import pandas as pd
 import docplex.mp.model as cpx
+import pathlib
 
 from model import *
 from tree import *
@@ -27,7 +28,6 @@ def check(
 
 # Example     
 if __name__ == '__main__':
-    import pathlib
     root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
     dataset = root / 'datasets/FICO/FICO.full.csv'
     ensemble = root / 'forests/FICO/FICO.RF1.txt'
