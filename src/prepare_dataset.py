@@ -112,18 +112,18 @@ def prepareData(benchmarkIdentifier):
             except:
                 print('Invalid line', linecount, ':', row)
             linecount = linecount + 1
-        numFeatures = len(continuousFeatureList)
+        numFeatures = len(continuousFeatureList) #type:ignore 
 
     
     target_map = {c: i for i, c in enumerate(np.unique(np.array(targetData)))}
     targetData = [target_map[t] for t in targetData]
-    numFeatures = len(continuousFeatureList)-1
+    numFeatures = len(continuousFeatureList)-1#type:ignore 
     continuousFeaturesLabels = []
     for index in range(numFeatures):
-        if continuousFeatureList[index] == 'F':
+        if continuousFeatureList[index] == 'F':#type:ignore 
             continuousFeaturesLabels.append(index)
     
-    return targetData, featureData, continuousFeaturesLabels, header, continuousFeatureList
+    return targetData, featureData, continuousFeaturesLabels, header, continuousFeatureList#type:ignore 
 
 ################################################################################
 # binning for continuous features
