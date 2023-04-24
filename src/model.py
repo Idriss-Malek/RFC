@@ -3,7 +3,6 @@ import numpy as np
 import docplex.mp.model as cpx
 import docplex.mp.dvar as cpv
 
-from anytree import PreOrderIter
 from tree import *
 
 epsilon = 1e-10
@@ -60,7 +59,7 @@ def getLambda(
 ) -> dict[tuple[int, int], cpv.Var]:
     keys = []
     for t, tree in enumerate(ensemble):
-        for d in range(tree.m_depth):
+        for d in range(tree.depth):
             keys.append((t, d))
     return mdl.binary_var_dict(keys, name='lambda')
 
@@ -88,7 +87,7 @@ def setYDepthCons(
     lam: dict[tuple[int, int], cpv.Var]
 ):
     for t, tree in enumerate(ensemble):
-        for d in range(tree.m_depth):
+        for d in range(tree.depth):
             y_ = [y[(t, node.left.id)] for node in tree.getNodesAtDepth(depth=d, leaves=False)]
             mdl.add_constraint_(sum(y_) <= lam[(t, d)])
 
@@ -97,10 +96,12 @@ def getMu(
     ensemble: TreeEnsemble
 ) -> dict[tuple[int, int], cpv.Var]:
     keys = []
-    for f, levels in ensemble.numerical_levels.items():
-        k = len(levels)
-        for j in range(k):
-            keys.append((f, j))
+    for feature in ensemble.features:
+        if feature.ftype == FeatureType.NUMERICAL:
+            f = feature.id
+            k = len(feature.levels)
+            for j in range(k):
+                keys.append((f, j))
     return mdl.binary_var_dict(keys, name='mu')
 
 def setMuLevelCons(
@@ -108,10 +109,12 @@ def setMuLevelCons(
     ensemble: TreeEnsemble,
     mu: dict[tuple[int, int], cpv.Var]
 ):
-    for f, levels in ensemble.numerical_levels.items():
-        k = len(levels)
-        for j in range(1, k):
-            mdl.add_constraint_(mu[(f, j-1)] >= mu[(f, j)])
+    for feature in ensemble.features:
+        if feature.ftype == FeatureType.NUMERICAL:
+            f = feature.id
+            k = len(feature.levels)
+            for j in range(1, k):
+                mdl.add_constraint_(mu[(f, j-1)] >= mu[(f, j)])
 
 def setMuNodesCons(
     mdl: cpx.Model,
@@ -120,24 +123,29 @@ def setMuNodesCons(
     y: dict[tuple[int, int], cpv.Var],
     epsilon: float = 1e-10
 ):
-    for f, levels in ensemble.numerical_levels.items():
-        k = len(levels)
-        for j in range(k):
-            for t, tree in enumerate(ensemble):
-                for node in tree.getNodesWithFeature(f, leaves=False):
-                    if node.thr == levels[j]:
-                        mdl.add_constraint_(mu[(f, j)] <= 1 - y[(t, node.left.id)])
-                        mdl.add_constraint_(mu[(f, j-1)] >= y[(t, node.right.id)])
-                        mdl.add_constraint_(mu[(f, j)] <= epsilon * y[(t, node.right.id)])
+    for feature in ensemble.features:
+        if feature.ftype == FeatureType.NUMERICAL:
+            k = len(feature.levels)
+            f = feature.id
+            for j in range(k):
+                for t, tree in enumerate(ensemble):
+                    for node in tree.getNodesWithFeature(f, leaves=False):
+                        if node.threshold == feature.levels[j]:
+                            mdl.add_constraint_(mu[(f, j)] <= 1 - y[(t, node.left.id)])
+                            mdl.add_constraint_(mu[(f, j-1)] >= y[(t, node.right.id)])
+                            mdl.add_constraint_(mu[(f, j)] <= epsilon * y[(t, node.right.id)])
 
 def getNu(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
 ) -> dict[tuple[int, int], cpv.Var]:
     keys = []
-    for f, categories in ensemble.categorical_values.items():
-        for c in categories:
-            keys.append((f, c))
+    for feature in ensemble.features:
+        if feature.ftype == FeatureType.CATEGORICAL:
+            f = feature.id
+            categories = feature.categories
+            for c in categories:
+                keys.append((f, c))
     return mdl.binary_var_dict(keys, name='nu')
 
 def setNuNodesCons(
@@ -146,20 +154,26 @@ def setNuNodesCons(
     nu: dict[tuple[int, int], cpv.Var],
     y: dict[tuple[int, int], cpv.Var],
 ):
-    for f, categories in ensemble.categorical_values.items():
-        for c in categories:
-            for t, tree in enumerate(ensemble):
-                for node in tree.getNodesWithFeature(f, leaves=False):
-                    if node.thr == c: # TODO: adapt to categorical values.
-                        mdl.add_constraint_(nu[(f, c)] <= 1 - y[(t, node.left.id)])
-                        mdl.add_constraint_(nu[(f, c)] >= y[(t, node.right.id)])
+    for feature in ensemble.features:
+        if feature.ftype == FeatureType.CATEGORICAL:
+            f = feature.id
+            categories = feature.categories
+            for c in categories:
+                for t, tree in enumerate(ensemble):
+                    for node in tree.getNodesWithFeature(f, leaves=False):
+                        if c in node.categories: # TODO: adapt to categorical values.
+                            mdl.add_constraint_(nu[(f, c)] <= 1 - y[(t, node.left.id)])
+                            mdl.add_constraint_(nu[(f, c)] >= y[(t, node.right.id)])
 
 def getX(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
 ) -> dict[int, cpv.Var]:
-    n_features = len(ensemble.binary_features)
-    return mdl.binary_var_dict(n_features, name='x')
+    keys = []
+    for feature in ensemble.features:
+        if feature.ftype == FeatureType.BINARY:
+            keys.append(feature.id)
+    return mdl.binary_var_dict(keys, name='x')
 
 def setXBinaryCons(
     mdl: cpx.Model,
@@ -167,11 +181,13 @@ def setXBinaryCons(
     x: dict[int, cpv.Var],
     y: dict[tuple[int, int], cpv.Var],
 ):
-    for f in ensemble.binary_features:
-        for t, tree in enumerate(ensemble):
-            for node in tree.getNodesWithFeature(f, leaves=False):
-                mdl.add_constraint_(x[f] <= 1 - y[(t, node.left.id)])
-                mdl.add_constraint_(x[f] >= y[(t, node.right.id)])
+    for feature in ensemble.features:
+        if feature.ftype == FeatureType.BINARY:
+            f = feature.id
+            for t, tree in enumerate(ensemble):
+                for node in tree.getNodesWithFeature(f, leaves=False):
+                    mdl.add_constraint_(x[f] <= 1 - y[(t, node.left.id)])
+                    mdl.add_constraint_(x[f] >= y[(t, node.right.id)])
 
 def getZ(
     mdl: cpx.Model,
@@ -300,13 +316,13 @@ class TreeEnsembleSeparator:
     def addZeta(self):
         self.zeta = getZeta(self.mdl)
 
-    def addZetaCons(self, u: np.ndarray, c: int, cc: int):
-        setZetaCons(self.mdl, self.ensemble, self.zeta, self.y, u, c, cc)
+    def addZetaCons(self, u: np.ndarray, c: int, g: int):
+        setZetaCons(self.mdl, self.ensemble, self.zeta, self.y, u, c, g)
 
     def addObj(self):
         setZetaObj(self.mdl, self.zeta)
 
-    def buildModel(self, u: np.ndarray, c: int, cc: int):
+    def buildModel(self, u: np.ndarray, c: int, g: int):
         self.addY()
         self.addLambda()
         self.addYCons()
@@ -319,7 +335,7 @@ class TreeEnsembleSeparator:
         self.addZ()
         self.addZCons(c)
         self.addZeta()
-        self.addZetaCons(u, c, cc)
+        self.addZetaCons(u, c, g)
         self.addObj()
 
     def clearY(self):
@@ -364,13 +380,13 @@ class TreeEnsembleSeparator:
         
         res = {}
         for c in range(self.ensemble.n_classes):
-            for cc in range(self.ensemble.n_classes):
+            for g in range(self.ensemble.n_classes):
                 self.mdl = cpx.Model(
-                    name=f'Separate_{c}_{cc}',
+                    name=f'Separate_{c}_{g}',
                     log_output=log_output,
                     float_precision=precision
                 )
-                self.buildModel(u, c, cc)
+                self.buildModel(u, c, g)
                 sol = self.mdl.solve()
                 if sol:
                     pass
@@ -470,7 +486,7 @@ class TreeEnsembleCompressor:
             if sol:
                 if log_output: self.mdl.report()
                 self.updateSol()
-                if self.mdl.objective_value == self.ensemble.getNTrees():
+                if self.mdl.objective_value == len(self.ensemble):
                     break
                 if on == 'train':
                     self.status = 'optimal'
