@@ -7,18 +7,18 @@ MAX_TREE_DEPTH: 4
 Format: node / node type (LN - leave node, IN - internal node) left child / right child / feature / threshold / node_depth / majority class (starts with index 0)
 
 [FEATURES] 
-sex:Female:B 
-age:<21:B 
-age:<23:B 
-age:<26:B 
-age:<46:B 
-juvenile-felonies:=0:B 
-juvenile-misdemeanors:=0:B 
-juvenile-crimes:=0:B 
-priors:=0:B 
-priors:=1:B 
-priors:2-3:B 
-priors:>3:B 
+sex:Female : B 
+age:<21 : B 
+age:<23 : B 
+age:<26 : B 
+age:<46 : B 
+juvenile-felonies:=0 : B 
+juvenile-misdemeanors:=0 : B 
+juvenile-crimes:=0 : B 
+priors:=0 : B 
+priors:=1 : B 
+priors:2-3 : B 
+priors:>3 : B 
 
 [TREE 0]
 NB_NODES: 29

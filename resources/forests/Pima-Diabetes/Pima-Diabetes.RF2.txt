@@ -7,14 +7,14 @@ MAX_TREE_DEPTH: 4
 Format: node / node type (LN - leave node, IN - internal node) left child / right child / feature / threshold / node_depth / majority class (starts with index 0)
 
 [FEATURES] 
-Pregnancies:F 
-Glucose:F 
-BloodPressure:F 
-SkinThickness:F 
-Insulin:F 
-BMI:F 
-DiabetesPedigreeFunction:F 
-Age:F 
+Pregnancies : F 
+Glucose : F 
+BloodPressure : F 
+SkinThickness : F 
+Insulin : F 
+BMI : F 
+DiabetesPedigreeFunction : F 
+Age : F 
 
 [TREE 0]
 NB_NODES: 25
