@@ -208,4 +208,4 @@ def process_dataset(dataset, numOfTrees, treeDepth, numOfRuns):
 ################################################################################
 #main(sys.argv[1],sys.argv[2],sys.argv[3], sys.argv[4])
 if __name__ == '__main__':
-    globals()[sys.argv[1]](sys.argv[2], sys.argv[2], sys.argv[2], sys.argv[2])
+    globals()[sys.argv[1]](sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
