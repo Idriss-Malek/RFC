@@ -74,7 +74,7 @@ def exportTreeCollection(datasetName, ensemble, runcount, numFeatures, numClasse
         f.write("\n")
         f.write("[FEATURES] \n")
         for i in range(numFeatures):
-            f.write(f'{features[i]}  :  {featureList[i]} \n')
+            f.write(f'{features[i]} : {featureList[i]} \n')
         f.write("\n")        
         for tree in range(len(n_nodes)):
             f.write("[TREE %s]\n"%tree)
