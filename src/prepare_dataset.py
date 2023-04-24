@@ -6,6 +6,7 @@ import math
 import random
 import time
 import csv
+import pathlib
 
 import numpy as np
 import scipy as scp
@@ -21,7 +22,9 @@ from os.path import join,getsize
 
 
 readline.parse_and_bind('tab:complete')
-
+root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
+dataset_dir = root / 'datasets'
+rf_dir = root / 'forests'
 
 ################################################################################
 # collecting trees from a scikit RF
@@ -56,11 +59,11 @@ def collectTreesRF(ensemble):
 #################################################################################
 # exporting a tree collection
 #################################################################################
-def exportTreeCollection(datasetName, ensemble, runcount, numFeatures, numClasses, n_nodes, children_left, children_right, feature, threshold, node_depth, is_leave, nodeValues):
+def exportTreeCollection(datasetName, ensemble, runcount, numFeatures, numClasses, n_nodes, children_left, children_right, feature, threshold, node_depth, is_leave, nodeValues,features, featureList):
     maxTreeDepth = []
     for tree in range(len(n_nodes)):
         maxTreeDepth.append(max(node_depth[tree]))
-    with open(datasetName + ".{}{}.txt".format(ensemble,runcount),"w+") as f:
+    with open(str(rf_dir / datasetName / datasetName) + ".{}{}.txt".format(ensemble,runcount),"w+") as f:
         f.write("DATASET_NAME: " + datasetName.split('/')[-1] + ".train{}.csv\n".format(runcount))
         f.write("ENSEMBLE: " + ensemble +"\n")
         f.write("NB_TREES: %s\n" %(len(n_nodes)))
@@ -69,6 +72,10 @@ def exportTreeCollection(datasetName, ensemble, runcount, numFeatures, numClasse
         f.write("MAX_TREE_DEPTH: %s\n" %(max(maxTreeDepth)))
         f.write("Format: node / node type (LN - leave node, IN - internal node) left child / right child / feature / threshold / node_depth / majority class (starts with index 0)\n")
         f.write("\n")
+        f.write("[FEATURES] \n")
+        for i in range(numFeatures):
+            f.write(f'{features[i]}:{featureList[i]} \n')
+        f.write("\n")        
         for tree in range(len(n_nodes)):
             f.write("[TREE %s]\n"%tree)
             f.write("NB_NODES: %s\n" %n_nodes[tree])
@@ -146,20 +153,23 @@ def binning(featureData, continuousFeatureList, numOfBins):
 # main
 ################################################################################
 def process_dataset(dataset, numOfTrees, treeDepth, numOfRuns):
-    targetData, featureData, continuousFeatureList, header, featureList = prepareData(dataset)
+    targetData, featureData, continuousFeatureList, header, featureList = prepareData(str(dataset_dir/ dataset / dataset)+'.csv')
     #
+    if not (rf_dir / dataset ).exists():
+        (rf_dir / dataset ).mkdir(parents=True)
+
     if len(continuousFeatureList) > 0:
         featureData = binning(featureData, continuousFeatureList, 10)
     
     targetDataNP, featureDataNP = np.array(targetData), np.array(featureData)
     # generate the relevant data sets
     numSamples = len(targetData) 
-    filename = dataset[:-4]
+    
     # save the full data set
-    with open(filename + ".featurelist.csv","w") as f:
+    with open(str(dataset_dir / dataset / dataset) + ".featurelist.csv","w+") as f:
         writer = csv.writer(f)
         writer.writerow(featureList)
-    with open(filename + ".full.csv","w") as f:
+    with open(str(dataset_dir / dataset / dataset) + ".full.csv","w+") as f:
         writer = csv.writer(f)
         writer.writerow(header)
         for index in range(numSamples):
@@ -175,7 +185,7 @@ def process_dataset(dataset, numOfTrees, treeDepth, numOfRuns):
         trainFeature, testFeature = featureDataNP[train_index].tolist(), featureDataNP[test_index].tolist()
         trainTarget, testTarget = targetDataNP[train_index].tolist(), targetDataNP[test_index].tolist()
     #
-        with open(filename + ".test%s.csv"%(count),"w") as fTest, open(filename + ".train%s.csv"%(count),"w") as fTrain:
+        with open(str(dataset_dir / dataset / dataset) + ".test%s.csv"%(count),"w+") as fTest, open(str(dataset_dir / dataset / dataset) + ".train%s.csv"%(count),"w+") as fTrain:
             testWriter = csv.writer(fTest)
             trainWriter = csv.writer(fTrain)
             testWriter.writerow(header)
@@ -199,9 +209,9 @@ def process_dataset(dataset, numOfTrees, treeDepth, numOfRuns):
         n_nodesRF, children_leftRF, children_rightRF, featureRF, thresholdRF, node_depthRF, is_leavesRF, nodeValuesRF = collectTreesRF(rfModel)
         # export the trees
 #        exportTreeCollection(filename + ".depth%s.result%s"%(treeDepth,count), "RF" , len(featureData[0]), len(rfModel.classes_), n_nodesRF, children_leftRF, children_rightRF, featureRF, thresholdRF, node_depthRF, is_leavesRF, nodeValuesRF)
-        exportTreeCollection(filename, "RF",  count, len(featureData[0]), len(rfModel.classes_),
+        exportTreeCollection(dataset, "RF",  count, len(featureData[0]), len(rfModel.classes_),
                              n_nodesRF, children_leftRF, children_rightRF, featureRF, thresholdRF,
-                             node_depthRF, is_leavesRF, nodeValuesRF)
+                             node_depthRF, is_leavesRF, nodeValuesRF, header, featureList)
   
         count = count + 1
 

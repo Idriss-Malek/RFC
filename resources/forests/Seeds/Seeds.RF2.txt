@@ -6,6 +6,15 @@ NB_CLASSES: 3
 MAX_TREE_DEPTH: 4
 Format: node / node type (LN - leave node, IN - internal node) left child / right child / feature / threshold / node_depth / majority class (starts with index 0)
 
+[FEATURES] 
+area:F 
+perimeter:F 
+compactness:F 
+kernel-length:F 
+kernel-width:F 
+asymmetry:F 
+kernel-groove:F 
+
 [TREE 0]
 NB_NODES: 23
 0 IN 1 12 4 5.5 0 -1
