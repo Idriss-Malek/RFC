@@ -20,10 +20,7 @@ def report(dataset, ensembles = None):
         ensembles = [str(ensemble) for ensemble in (rf_dir / dataset).iterdir() if ensemble.is_file()]
     df = pd.DataFrame(columns=['Ensemble', 'Train Dataset', 'Test Dataset','Original Size', 'Compressed Size', 'Compression Time', 'Accuracy on Train Dataset', 'Compression is Lossless for Train dataset', 'Lossless compression rate for test dataset', 'Original accuracy on Test Dataset', 'New accuracy on Test Dataset'])
     for ensemble in ensembles:
-        ensemble_name = ensemble[len(str(rf_dir / dataset))]
-        print('XXXX')
-        print(ensemble_name)
-        hh
+        ensemble_name = ensemble[len(str(rf_dir / dataset))+1:]
         with open(ensemble) as f:
             train_name=(f.readline().strip('\n'))[14:]
             f.close()
