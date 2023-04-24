@@ -26,6 +26,20 @@ def check(
             return False
     return True
 
+def checkRate(
+    ensemble: TreeEnsemble,
+    u: np.ndarray,
+    dataset: pd.DataFrame
+):
+    res=[]
+    for _, x in dataset.iterrows():
+        if checkKlass(ensemble, u, np.array(x.values)):
+            res.append(1)
+        else:
+            res.append(0)
+    
+    return sum(res)/len(res)
+
 # Example     
 if __name__ == '__main__':
     root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'

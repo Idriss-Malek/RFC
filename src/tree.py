@@ -202,7 +202,7 @@ class TreeEnsemble(Iterable[Tree]):
         n_classes = int(lines[4].split(": ")[1])
         m_depth = int(lines[5].split(": ")[1])
         t = 0
-        lineIdx = 8
+        lineIdx = 8 + n_features + 2
         trees = []
         while t < n_trees:
             tree = Tree.from_lines(lines[lineIdx:])
