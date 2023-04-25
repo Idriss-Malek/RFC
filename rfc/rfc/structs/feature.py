@@ -1,4 +1,5 @@
 from typing import Any
+from collections.abc import Iterable
 from enum import Enum
 
 class FeatureType(Enum):
@@ -17,11 +18,17 @@ class Feature(object):
         self,
         id_: int,
         ftype: FeatureType,
-        name: None | str = None
+        name: None | str = None,
+        levels: None | Iterable[float] = None,
+        categories: None | list[Any] = None,
     ) -> None:
         self.id = id_
         self.name = name if name is not None else f'Feature {id_}'
         self.ftype = ftype
+        if levels is not None:
+            self.levels = levels
+        if categories is not None:
+            self.categories = categories
 
     @property
     def levels(self) -> list[float]:
@@ -32,11 +39,11 @@ class Feature(object):
         return self._levels
 
     @levels.setter
-    def levels(self, levels: list[float]):
+    def levels(self, levels: Iterable[float]):
         if self.ftype != FeatureType.NUMERICAL:
             raise ValueError("Levels are only defined for numerical features!")
-        self._levels = levels
-
+        self._levels = list(sorted(levels))
+                
     @property
     def categories(self) -> list[Any]:
         if self.ftype != FeatureType.CATEGORICAL:

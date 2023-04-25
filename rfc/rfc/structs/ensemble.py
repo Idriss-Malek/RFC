@@ -55,14 +55,11 @@ class TreeEnsemble(Iterable[Tree]):
     def _updateNumericalLevels(self):
         for feature in self.features:
             if feature.ftype == FeatureType.NUMERICAL:
-                levels = []
+                levels = set()
                 for tree in self:
-                    levels += [node.threshold for node in tree.getNodesWithFeature(feature.id)]
-                levels = np.array(levels)
-                levels = np.sort(levels)
-                levels = 0.5 * (1 + np.tanh(levels))
-                feature.levels = list(levels)
-                feature.levels = [0.0] + feature.levels + [1.0]
+                    tree_levels = [node.threshold for node in tree.getNodesWithFeature(feature.id)]
+                    levels = levels | set(tree_levels)
+                feature.levels = levels
 
     def __getitem__(self, idx: int) -> Tree:
         return self.trees[idx]

@@ -1,8 +1,9 @@
+from enum import Enum
+
 from ..structs.ensemble import TreeEnsemble
 from ..structs.node import Node
 from ..structs.feature import Feature, FeatureType
 from ..structs.tree import Tree
-from enum import Enum
 
 class NodeType(Enum):
     INTERNAL = 'IN'
