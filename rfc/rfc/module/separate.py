@@ -6,11 +6,13 @@ class TreeEnsembleSeparator:
     mdl: cpx.Model
     y: dict[tuple[int, int], cpv.Var]
     lam: dict[tuple[int, int], cpv.Var]
-    x: dict[int, cpv.Var]
     z: list[cpv.Var]
     zeta: list[cpv.Var]
     mu: dict[tuple[int, int], cpv.Var]
     nu: dict[tuple[int, int], cpv.Var]
+    xi: dict[int, cpv.Var]
+    x: np.ndarray
+
     epsilon: float
     
     def __init__(
@@ -45,11 +47,11 @@ class TreeEnsembleSeparator:
     def addNuCons(self):
         setNuNodesCons(self.mdl, self.ensemble, self.nu, self.y)
 
-    def addX(self):
-        self.x = getX(self.mdl, self.ensemble)
+    def addXi(self):
+        self.xi = getXi(self.mdl, self.ensemble)
 
-    def addXCons(self):
-        setXBinaryCons(self.mdl, self.ensemble, self.x, self.y)
+    def addXiCons(self):
+        setXiBinaryCons(self.mdl, self.ensemble, self.xi, self.y)
 
     def addZ(self):
         self.z = getZ(self.mdl, self.ensemble)
@@ -67,6 +69,26 @@ class TreeEnsembleSeparator:
     def addObj(self):
         setZetaObj(self.mdl, self.zeta)
 
+    def updateX(self):
+        n_features = len(self.ensemble.features)
+        self.x = np.zeros(n_features)
+        for feature in self.ensemble.features:
+            f = feature.id
+            match feature.ftype:
+                case FeatureType.BINARY:
+                    self.x[f] = self.xi[f].solution_value    
+                case FeatureType.NUMERICAL:
+                    levels = feature.levels
+                    k = len(levels) + 1
+                    vs = [0.5 * (1 + np.tanh(v)) for v in levels]
+                    vs = [0.0] + vs + [1.0]
+                    vs = np.array(vs)
+                    mu = np.array([self.mu[(f, j)].solution_value for j in range(k)])
+                    self.x[f] = np.arctanh(2 * (np.diff(vs) @ mu) - 1) # TODO: check this later.
+                    pass
+                case FeatureType.CATEGORICAL:
+                    pass
+
     def buildModel(self, u: np.ndarray, c: int, g: int):
         self.addY()
         self.addLambda()
@@ -75,8 +97,8 @@ class TreeEnsembleSeparator:
         self.addMuCons()
         self.addNu()
         self.addNuCons()
-        self.addX()
-        self.addXCons()
+        self.addXi()
+        self.addXiCons()
         self.addZ()
         self.addZCons(c)
         self.addZeta()
@@ -136,9 +158,8 @@ class TreeEnsembleSeparator:
                     sol = self.mdl.solve()
                     if sol:
                         if self.mdl.objective_value < 0:
-                            res[(c, g, 'x')] = np.array([self.x[i].solution_value for i in self.x.keys()])
-                            res[(c, g, 'mu')] = np.array([self.mu[i].solution_value for i in self.mu.keys()])
-
+                            self.updateX()
+                            res[(c, g)] = self.x
                     else:
                         pass
                     self.clearModel()

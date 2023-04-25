@@ -82,8 +82,7 @@ def setYChildCons(
 ):
     for t, tree in enumerate(ensemble):
         for node in tree.getNodes():
-            if not node.is_leaf:
-                mdl.add_constraint_(y[(t, node.id)] == y[(t, node.left.id)] + y[(t, node.right.id)])
+            mdl.add_constraint_(y[(t, node.id)] == y[(t, node.left.id)] + y[(t, node.right.id)])
 
 def setYDepthCons(
     mdl: cpx.Model,
@@ -93,7 +92,7 @@ def setYDepthCons(
 ):
     for t, tree in enumerate(ensemble):
         for d in range(tree.depth):
-            y_ = [y[(t, node.left.id)] for node in tree.getNodesAtDepth(depth=d) if not node.is_leaf]
+            y_ = [y[(t, node.left.id)] for node in tree.getNodesAtDepth(depth=d)]
             mdl.add_constraint_(sum(y_) <= lam[(t, d)])
 
 def getMu(
@@ -104,7 +103,7 @@ def getMu(
     for feature in ensemble.features:
         if feature.ftype == FeatureType.NUMERICAL:
             f = feature.id
-            k = len(feature.levels)
+            k = len(feature.levels) + 1
             for j in range(k):
                 keys.append((f, j))
     return mdl.continuous_var_dict(keys, lb=0.0, ub=1.0, name='mu')
@@ -117,7 +116,7 @@ def setMuLevelCons(
     for feature in ensemble.features:
         if feature.ftype == FeatureType.NUMERICAL:
             f = feature.id
-            k = len(feature.levels) + 2
+            k = len(feature.levels) + 1
             for j in range(1, k):
                 mdl.add_constraint_(mu[(f, j-1)] >= mu[(f, j)])
 
@@ -131,7 +130,7 @@ def setMuNodesCons(
     for feature in ensemble.features:
         if feature.ftype == FeatureType.NUMERICAL:
             f = feature.id
-            k = len(feature.levels) + 2
+            k = len(feature.levels) + 1
             for j in range(1, k):
                 for t, tree in enumerate(ensemble):
                     for node in tree.getNodesWithFeature(f):
@@ -170,7 +169,7 @@ def setNuNodesCons(
                             mdl.add_constraint_(nu[(f, c)] <= 1 - y[(t, node.left.id)])
                             mdl.add_constraint_(nu[(f, c)] >= y[(t, node.right.id)])
 
-def getX(
+def getXi(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
 ) -> dict[int, cpv.Var]:
@@ -180,7 +179,7 @@ def getX(
             keys.append(feature.id)
     return mdl.binary_var_dict(keys, name='x')
 
-def setXBinaryCons(
+def setXiBinaryCons(
     mdl: cpx.Model,
     ensemble: TreeEnsemble,
     x: dict[int, cpv.Var],
