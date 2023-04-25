@@ -82,7 +82,8 @@ def setYChildCons(
 ):
     for t, tree in enumerate(ensemble):
         for node in tree.getNodes():
-            mdl.add_constraint_(y[(t, node.id)] == y[(t, node.left.id)] + y[(t, node.right.id)])
+            if not node.is_leaf:
+                mdl.add_constraint_(y[(t, node.id)] == y[(t, node.left.id)] + y[(t, node.right.id)])
 
 def setYDepthCons(
     mdl: cpx.Model,
@@ -92,7 +93,7 @@ def setYDepthCons(
 ):
     for t, tree in enumerate(ensemble):
         for d in range(tree.depth):
-            y_ = [y[(t, node.left.id)] for node in tree.getNodesAtDepth(depth=d)]
+            y_ = [y[(t, node.left.id)] for node in tree.getNodesAtDepth(depth=d) if not node.is_leaf]
             mdl.add_constraint_(sum(y_) <= lam[(t, d)])
 
 def getMu(
@@ -104,7 +105,7 @@ def getMu(
         if feature.ftype == FeatureType.NUMERICAL:
             f = feature.id
             k = len(feature.levels)
-            for j in range(k):
+            for j in range(k+1):
                 keys.append((f, j))
     return mdl.binary_var_dict(keys, name='mu')
 
