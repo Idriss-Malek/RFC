@@ -55,7 +55,7 @@ def report(dataset, ensembles = None):
             compression = False
         row = {'Ensemble' : ensemble_name, 'Train Dataset' : train_name, 'Test Dataset' : test_name, 'Original Size' : original_size, 'Compressed Size' : compressed_size, 'Compression Time' : compression_time, 'Accuracy on Train Dataset' : acc_train, 'Compression is Lossless for Train dataset' : compression, 'Lossless compression rate for test dataset': lossless_rate, 'Original accuracy on Test Dataset' : original_acc_test,'New accuracy on Test Dataset' : new_acc_test } 
         df = df._append(row, ignore_index = True) #type:ignore
-    df.to_csv(str(results_dir / dataset/ dataset)+f'_comp{time()}') 
+    df.to_csv(str(results_dir / dataset/ dataset)+f'_comp{int(1000*time())}.csv') 
     
     
 
