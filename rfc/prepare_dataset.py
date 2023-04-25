@@ -59,7 +59,7 @@ def collectTreesRF(ensemble):
 #################################################################################
 # exporting a tree collection
 #################################################################################
-def exportTreeCollection(datasetName, ensemble, runcount, numFeatures, numClasses, n_nodes, children_left, children_right, feature, threshold, node_depth, is_leave, nodeValues,features, featureList, discretes):
+def exportTreeCollection(datasetName, ensemble, runcount, numFeatures, numClasses, n_nodes, children_left, children_right, feature, threshold, node_depth, is_leave, nodeValues,features, featureList):
     maxTreeDepth = []
     for tree in range(len(n_nodes)):
         maxTreeDepth.append(max(node_depth[tree]))
@@ -74,13 +74,7 @@ def exportTreeCollection(datasetName, ensemble, runcount, numFeatures, numClasse
         f.write("\n")
         f.write("[FEATURES] \n")
         for i in range(numFeatures):
-            if featureList[i]!='D':
-                f.write(f'{features[i]} : {featureList[i]} \n')
-            else:
-                f.write(f'{features[i]} : D ')
-                for val in sorted(discretes[i]):
-                    f.write(f'{val} ')
-                f.write("\n") 
+            f.write(f'{features[i]} : {featureList[i]} \n')
         f.write("\n")        
         for tree in range(len(n_nodes)):
             f.write("[TREE %s]\n"%tree)
@@ -106,22 +100,18 @@ def prepareData(benchmarkIdentifier):
     with open(benchmarkIdentifier, 'r', encoding='cp1252') as csvFile:
         csvReader = csv.reader(csvFile, delimiter = ',')
         linecount = 0
-        discretes={}
         for row in csvReader:
             try:
                 if not linecount <= 1:
                     featureData.append([float(x) for x in row[:-1]])
                     targetData.append(int(row[-1]))
-                    for index in discretes.keys():
-                        discretes[index].add(int(row[index]))
+
                 if linecount == 0:
                     header = row
                 if linecount == 1:
                     continuousFeatureList = row
                     numFeatures = len(continuousFeatureList)-1#type:ignore 
-                    for index in range(numFeatures):#type:ignore
-                        if continuousFeatureList[index] == 'D':#type:ignore 
-                            discretes[index]= set()
+
 
             except:
                 print('Invalid line', linecount, ':', row)
@@ -136,7 +126,7 @@ def prepareData(benchmarkIdentifier):
         if continuousFeatureList[index] == 'F':#type:ignore 
             continuousFeaturesLabels.append(index)
     
-    return targetData, featureData, continuousFeaturesLabels, header, continuousFeatureList, discretes#type:ignore 
+    return targetData, featureData, continuousFeaturesLabels, header, continuousFeatureList#type:ignore 
 
 ################################################################################
 # binning for continuous features
@@ -166,7 +156,7 @@ def binning(featureData, continuousFeatureList, numOfBins):
 # main
 ################################################################################
 def process_dataset(dataset, numOfTrees, treeDepth, numOfRuns):
-    targetData, featureData, continuousFeatureList, header, featureList, discretes = prepareData(str(dataset_dir/ dataset / dataset)+'.csv')
+    targetData, featureData, continuousFeatureList, header, featureList = prepareData(str(dataset_dir/ dataset / dataset)+'.csv')
     #
     if not (rf_dir / dataset ).exists():
         (rf_dir / dataset ).mkdir(parents=True)
@@ -224,7 +214,7 @@ def process_dataset(dataset, numOfTrees, treeDepth, numOfRuns):
 #        exportTreeCollection(filename + ".depth%s.result%s"%(treeDepth,count), "RF" , len(featureData[0]), len(rfModel.classes_), n_nodesRF, children_leftRF, children_rightRF, featureRF, thresholdRF, node_depthRF, is_leavesRF, nodeValuesRF)
         exportTreeCollection(dataset, "RF",  count, len(featureData[0]), len(rfModel.classes_),
                              n_nodesRF, children_leftRF, children_rightRF, featureRF, thresholdRF,
-                             node_depthRF, is_leavesRF, nodeValuesRF, header, featureList, discretes)
+                             node_depthRF, is_leavesRF, nodeValuesRF, header, featureList)
   
         count = count + 1
 

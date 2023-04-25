@@ -126,16 +126,17 @@ class TreeEnsembleSeparator:
         res = {}
         for c in range(self.ensemble.n_classes):
             for g in range(self.ensemble.n_classes):
-                self.mdl = cpx.Model(
-                    name=f'Separate_{c}_{g}',
-                    log_output=log_output,
-                    float_precision=precision
-                )
-                self.buildModel(u, c, g)
-                sol = self.mdl.solve()
-                if sol:
-                    pass
-                else:
-                    pass
-                self.clearModel()
+                if c != g :
+                    self.mdl = cpx.Model(
+                        name=f'Separate_{c}_{g}',
+                        log_output=log_output,
+                        float_precision=precision
+                    )
+                    self.buildModel(u, c, g)
+                    sol = self.mdl.solve()
+                    if sol:
+                        pass
+                    else:
+                        pass
+                    self.clearModel()
         return res

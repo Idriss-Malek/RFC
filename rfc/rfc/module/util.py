@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-from ..structs import TreeEnsemble
+
+from ..structs.ensemble import TreeEnsemble
 
 def checkKlass(
     ensemble: TreeEnsemble,
@@ -35,4 +36,24 @@ def checkRate(
         else:
             res.append(0)
     
-    return sum(res) / len(res)
+    return np.array(res).mean()
+
+def accuracy(
+        ensemble: TreeEnsemble,
+        dataset: pd.DataFrame,
+        u: np.ndarray = np.array(None)
+) -> float:
+    if u == np.array(None):
+        u = np.ones(len(ensemble.trees))
+    w = ensemble.weights
+    wu = u * w
+    acc=[]
+    for _, x in dataset.iterrows():
+        F = ensemble.getF(x)# type: ignore
+        c = np.argmax(F.dot(wu))
+        if c == x[-1]:
+            acc.append(1)
+        else:
+            acc.append(0)
+
+    return np.array(acc).mean()

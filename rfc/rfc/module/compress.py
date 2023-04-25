@@ -1,8 +1,12 @@
 import pandas as pd
+import numpy as np
 
 from enum import Enum
+import docplex.mp.model as cpx
+import docplex.mp.dvar as cpv
 
 from .cplex import *
+
 from .separate import TreeEnsembleSeparator
 from ..structs.ensemble import TreeEnsemble
 

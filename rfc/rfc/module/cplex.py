@@ -258,4 +258,4 @@ def setZetaObj(
     mdl: cpx.Model,
     zeta: list[cpv.Var]
 ):
-    mdl.maximize(zeta[0] - zeta[1])
+    mdl.minimize(zeta[0] - zeta[1])
