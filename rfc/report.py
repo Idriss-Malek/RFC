@@ -3,8 +3,7 @@ import pathlib
 from time import process_time,time
 
 from rfc.module import TreeEnsembleCompressor, TreeEnsembleCompressorStatus
-from rfc.utils import check_on_dataset, rate_on_dataset, accuracy
-from rfc.structs import TreeEnsemble
+from rfc.utils import check_on_dataset, rate_on_dataset, accuracy, load_tree_ensemble
 
 
 
@@ -31,7 +30,7 @@ def report(dataset, ensembles = None):
         test_name = train_name.replace("train","test")
         train_data = str(dataset_dir /dataset/ train_name )
         test_data = train_data.replace("train","test")
-        ensemble = TreeEnsemble.from_file(ensemble)
+        ensemble = load_tree_ensemble(ensemble)
         train_data=pd.read_csv(train_data)
         test_data=pd.read_csv(test_data)
         cmp = TreeEnsembleCompressor(ensemble, train_data)

@@ -29,19 +29,15 @@ class TreeEnsembleCompressor:
 
     def __init__(
         self,
-        ensemble: str | TreeEnsemble,
-        dataset: str | pd.DataFrame,
+        ensemble: TreeEnsemble,
+        dataset: pd.DataFrame,
         lazy: bool = False
     ) -> None:
-        if isinstance(ensemble, str):
-            ensemble = TreeEnsemble.from_file(ensemble)
-        elif not isinstance(ensemble, TreeEnsemble):
-            raise TypeError('ensemble must be a TreeEnsemble or a path to a file')
+        if not isinstance(ensemble, TreeEnsemble):
+            raise TypeError('ensemble must be a TreeEnsemble')
 
-        if isinstance(dataset, str):
-            dataset = pd.read_csv(dataset)
-        elif not isinstance(dataset, pd.DataFrame):
-            raise TypeError('dataset must be a DataFrame or a path to a file')
+        if not isinstance(dataset, pd.DataFrame):
+            raise TypeError('dataset must be a DataFrame')
 
         self.ensemble = ensemble
         self.dataset = dataset

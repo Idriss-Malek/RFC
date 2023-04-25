@@ -131,10 +131,10 @@ def setMuNodesCons(
         if feature.ftype == FeatureType.NUMERICAL:
             k = len(feature.levels)
             f = feature.id
-            for j in range(k):
+            for j in range(1, k):
                 for t, tree in enumerate(ensemble):
                     for node in tree.getNodesWithFeature(f):
-                        if node.threshold == feature.levels[j]:
+                        if 0.5 * (1 + np.tanh(node.threshold)) == feature.levels[j]:
                             mdl.add_constraint_(mu[(f, j)] <= 1 - y[(t, node.left.id)])
                             mdl.add_constraint_(mu[(f, j-1)] >= y[(t, node.right.id)])
                             mdl.add_constraint_(mu[(f, j)] <= epsilon * y[(t, node.right.id)])

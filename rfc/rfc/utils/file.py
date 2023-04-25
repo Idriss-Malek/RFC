@@ -41,7 +41,6 @@ def load_tree_ensemble(file: str, log_output: bool = False) -> TreeEnsemble:
                 ftype = FeatureType.NUMERICAL
             case 'D':
                 ftype = FeatureType.NUMERICAL
-                lineIdx += 1 # TODO: remove this line.
             case 'C':
                 ftype = FeatureType.CATEGORICAL
             case 'B':
