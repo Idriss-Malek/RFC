@@ -1,0 +1,11 @@
+,Ensemble,Train Dataset,Test Dataset,Original Size,Compressed Size,Compression Time,Accuracy on Train Dataset,Compression is Lossless for Train dataset,Lossless compression rate for test dataset,Original accuracy on Test Dataset,New accuracy on Test Dataset
+0,Pima-Diabetes.RF1.txt,Pima-Diabetes.train1.csv,Pima-Diabetes.test1.csv,100,6.0,5.270951273,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+1,Pima-Diabetes.RF6.txt,Pima-Diabetes.train6.csv,Pima-Diabetes.test6.csv,100,4.0,4.446054497999999,Not Implemented Yet,True,0.987012987012987,Not Implemented Yet,Not Implemented Yet
+2,Pima-Diabetes.RF10.txt,Pima-Diabetes.train10.csv,Pima-Diabetes.test10.csv,100,4.0,1.5378646290000013,Not Implemented Yet,True,0.9868421052631579,Not Implemented Yet,Not Implemented Yet
+3,Pima-Diabetes.RF8.txt,Pima-Diabetes.train8.csv,Pima-Diabetes.test8.csv,100,2.0,1.1539052519999977,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+4,Pima-Diabetes.RF9.txt,Pima-Diabetes.train9.csv,Pima-Diabetes.test9.csv,100,2.0,1.2428195399999993,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+5,Pima-Diabetes.RF7.txt,Pima-Diabetes.train7.csv,Pima-Diabetes.test7.csv,100,6.0,5.827970535000002,Not Implemented Yet,False,1.0,Not Implemented Yet,Not Implemented Yet
+6,Pima-Diabetes.RF3.txt,Pima-Diabetes.train3.csv,Pima-Diabetes.test3.csv,100,2.0,0.8865732000000008,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+7,Pima-Diabetes.RF4.txt,Pima-Diabetes.train4.csv,Pima-Diabetes.test4.csv,100,6.0,5.7553926370000035,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+8,Pima-Diabetes.RF5.txt,Pima-Diabetes.train5.csv,Pima-Diabetes.test5.csv,100,4.0,1.610134072000001,Not Implemented Yet,True,0.987012987012987,Not Implemented Yet,Not Implemented Yet
+9,Pima-Diabetes.RF2.txt,Pima-Diabetes.train2.csv,Pima-Diabetes.test2.csv,100,4.0,1.4681150720000034,Not Implemented Yet,False,0.948051948051948,Not Implemented Yet,Not Implemented Yet

@@ -1,0 +1,11 @@
+,Ensemble,Train Dataset,Test Dataset,Original Size,Compressed Size,Compression Time,Accuracy on Train Dataset,Compression is Lossless for Train dataset,Lossless compression rate for test dataset,Original accuracy on Test Dataset,New accuracy on Test Dataset
+0,FICO.RF7.txt,FICO.train7.csv,FICO.test7.csv,100,2.0,9.445677166000003,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+1,FICO.RF9.txt,FICO.train9.csv,FICO.test9.csv,100,2.0,9.571817328999998,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+2,FICO.RF10.txt,FICO.train10.csv,FICO.test10.csv,100,2.0,9.453409232999988,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+3,FICO.RF8.txt,FICO.train8.csv,FICO.test8.csv,100,2.0,9.488988316000004,Not Implemented Yet,True,0.9990439770554493,Not Implemented Yet,Not Implemented Yet
+4,FICO.RF1.txt,FICO.train1.csv,FICO.test1.csv,100,2.0,9.456741854,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+5,FICO.RF6.txt,FICO.train6.csv,FICO.test6.csv,100,2.0,9.414948893000002,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+6,FICO.RF5.txt,FICO.train5.csv,FICO.test5.csv,100,2.0,9.338768455000007,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+7,FICO.RF2.txt,FICO.train2.csv,FICO.test2.csv,100,2.0,9.434287581999996,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+8,FICO.RF3.txt,FICO.train3.csv,FICO.test3.csv,100,2.0,9.57818405399999,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+9,FICO.RF4.txt,FICO.train4.csv,FICO.test4.csv,100,2.0,9.443159186999992,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet

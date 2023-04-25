@@ -1,0 +1,11 @@
+,Ensemble,Train Dataset,Test Dataset,Original Size,Compressed Size,Compression Time,Accuracy on Train Dataset,Compression is Lossless for Train dataset,Lossless compression rate for test dataset,Original accuracy on Test Dataset,New accuracy on Test Dataset
+0,COMPAS-ProPublica.RF7.txt,COMPAS-ProPublica.train7.csv,COMPAS-ProPublica.test7.csv,100,2.0,7.367909073000021,Not Implemented Yet,True,0.9985528219971056,Not Implemented Yet,Not Implemented Yet
+1,COMPAS-ProPublica.RF9.txt,COMPAS-ProPublica.train9.csv,COMPAS-ProPublica.test9.csv,100,2.0,7.513369613000009,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+2,COMPAS-ProPublica.RF8.txt,COMPAS-ProPublica.train8.csv,COMPAS-ProPublica.test8.csv,100,2.0,7.329888117999985,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+3,COMPAS-ProPublica.RF1.txt,COMPAS-ProPublica.train1.csv,COMPAS-ProPublica.test1.csv,100,2.0,7.259349514000007,Not Implemented Yet,True,0.9985528219971056,Not Implemented Yet,Not Implemented Yet
+4,COMPAS-ProPublica.RF10.txt,COMPAS-ProPublica.train10.csv,COMPAS-ProPublica.test10.csv,100,2.0,6.8641585000000305,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+5,COMPAS-ProPublica.RF6.txt,COMPAS-ProPublica.train6.csv,COMPAS-ProPublica.test6.csv,100,2.0,7.864340348999974,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+6,COMPAS-ProPublica.RF5.txt,COMPAS-ProPublica.train5.csv,COMPAS-ProPublica.test5.csv,100,2.0,6.845655425000018,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+7,COMPAS-ProPublica.RF2.txt,COMPAS-ProPublica.train2.csv,COMPAS-ProPublica.test2.csv,100,2.0,7.214995360000046,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+8,COMPAS-ProPublica.RF3.txt,COMPAS-ProPublica.train3.csv,COMPAS-ProPublica.test3.csv,100,2.0,7.213651003000052,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+9,COMPAS-ProPublica.RF4.txt,COMPAS-ProPublica.train4.csv,COMPAS-ProPublica.test4.csv,100,2.0,7.431508830000041,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
