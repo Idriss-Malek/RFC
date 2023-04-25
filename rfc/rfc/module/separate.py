@@ -136,7 +136,8 @@ class TreeEnsembleSeparator:
                     sol = self.mdl.solve()
                     if sol:
                         if self.mdl.objective_value < 0:
-                            res[(c, g)] = np.array([self.x[i].solution_value for i in self.x.keys()])
+                            res[(c, g, 'x')] = np.array([self.x[i].solution_value for i in self.x.keys()])
+                            res[(c, g, 'mu')] = np.array([self.mu[i].solution_value for i in self.mu.keys()])
 
                     else:
                         pass
