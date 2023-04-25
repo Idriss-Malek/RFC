@@ -1,0 +1,11 @@
+,Ensemble,Train Dataset,Test Dataset,Original Size,Compressed Size,Compression Time,Accuracy on Train Dataset,Compression is Lossless for Train dataset,Lossless compression rate for test dataset,Original accuracy on Test Dataset,New accuracy on Test Dataset
+0,Breast-Cancer-Wisconsin.RF1.txt,Breast-Cancer-Wisconsin.train1.csv,Breast-Cancer-Wisconsin.test1.csv,100,2.0,0.6434629859999745,Not Implemented Yet,True,0.9855072463768116,Not Implemented Yet,Not Implemented Yet
+1,Breast-Cancer-Wisconsin.RF6.txt,Breast-Cancer-Wisconsin.train6.csv,Breast-Cancer-Wisconsin.test6.csv,100,2.0,0.6290008889999967,Not Implemented Yet,True,0.9852941176470589,Not Implemented Yet,Not Implemented Yet
+2,Breast-Cancer-Wisconsin.RF8.txt,Breast-Cancer-Wisconsin.train8.csv,Breast-Cancer-Wisconsin.test8.csv,100,2.0,0.6221815950000291,Not Implemented Yet,True,0.9852941176470589,Not Implemented Yet,Not Implemented Yet
+3,Breast-Cancer-Wisconsin.RF9.txt,Breast-Cancer-Wisconsin.train9.csv,Breast-Cancer-Wisconsin.test9.csv,100,2.0,0.6211422000000084,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+4,Breast-Cancer-Wisconsin.RF7.txt,Breast-Cancer-Wisconsin.train7.csv,Breast-Cancer-Wisconsin.test7.csv,100,2.0,0.6851550040000234,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+5,Breast-Cancer-Wisconsin.RF10.txt,Breast-Cancer-Wisconsin.train10.csv,Breast-Cancer-Wisconsin.test10.csv,100,2.0,0.6339547979999907,Not Implemented Yet,True,0.9852941176470589,Not Implemented Yet,Not Implemented Yet
+6,Breast-Cancer-Wisconsin.RF3.txt,Breast-Cancer-Wisconsin.train3.csv,Breast-Cancer-Wisconsin.test3.csv,100,2.0,0.6279991370000175,Not Implemented Yet,True,0.9855072463768116,Not Implemented Yet,Not Implemented Yet
+7,Breast-Cancer-Wisconsin.RF4.txt,Breast-Cancer-Wisconsin.train4.csv,Breast-Cancer-Wisconsin.test4.csv,100,2.0,0.6276128900000231,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet
+8,Breast-Cancer-Wisconsin.RF5.txt,Breast-Cancer-Wisconsin.train5.csv,Breast-Cancer-Wisconsin.test5.csv,100,2.0,0.6192575150000152,Not Implemented Yet,True,0.9852941176470589,Not Implemented Yet,Not Implemented Yet
+9,Breast-Cancer-Wisconsin.RF2.txt,Breast-Cancer-Wisconsin.train2.csv,Breast-Cancer-Wisconsin.test2.csv,100,2.0,0.6230150910000134,Not Implemented Yet,True,1.0,Not Implemented Yet,Not Implemented Yet

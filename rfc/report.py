@@ -14,11 +14,15 @@ dataset_dir = root / 'datasets'
 rf_dir = root / 'forests'
 
 def report(dataset, ensembles = None):
+
     if not (results_dir / dataset ).exists():
         (results_dir / dataset ).mkdir(parents=True)
+
     if ensembles is None:
         ensembles = [str(ensemble) for ensemble in (rf_dir / dataset).iterdir() if ensemble.is_file()]
+
     df = pd.DataFrame(columns=['Ensemble', 'Train Dataset', 'Test Dataset','Original Size', 'Compressed Size', 'Compression Time', 'Accuracy on Train Dataset', 'Compression is Lossless for Train dataset', 'Lossless compression rate for test dataset', 'Original accuracy on Test Dataset', 'New accuracy on Test Dataset'])
+    
     for ensemble in ensembles:
         ensemble_name = ensemble[len(str(rf_dir / dataset))+1:]
         with open(ensemble) as f:
@@ -31,9 +35,11 @@ def report(dataset, ensembles = None):
         train_data=pd.read_csv(train_data)
         test_data=pd.read_csv(test_data)
         cmp = TreeEnsembleCompressor(ensemble, train_data)
+        
         t1=process_time()
         cmp.compress(on='train', log_output=True, precision=8)
         compression_time=process_time()-t1
+        
         original_size = len(ensemble.trees)
         compressed_size = sum(cmp.sol)
         acc_train = 'Not Implemented Yet'
@@ -54,4 +60,8 @@ def report(dataset, ensembles = None):
     
 
 if __name__ == "__main__":
-    report('HTRU2')
+    report('Pima-Diabetes')
+    report('FICO')
+    report('Seeds')
+    report('COMPAS-ProPublica')
+    report('Breast-Cancer-Wisconsin')
