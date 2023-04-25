@@ -103,10 +103,10 @@ def getMu(
     for feature in ensemble.features:
         if feature.ftype == FeatureType.NUMERICAL:
             f = feature.id
-            k = len(feature.levels)
+            k = len(feature.levels) + 2
             for j in range(k):
                 keys.append((f, j))
-    return mdl.binary_var_dict(keys, name='mu')
+    return mdl.continuous_var_dict(keys, lb=0.0, ub=1.0, name='mu')
 
 def setMuLevelCons(
     mdl: cpx.Model,
@@ -116,7 +116,7 @@ def setMuLevelCons(
     for feature in ensemble.features:
         if feature.ftype == FeatureType.NUMERICAL:
             f = feature.id
-            k = len(feature.levels)
+            k = len(feature.levels) + 2
             for j in range(1, k):
                 mdl.add_constraint_(mu[(f, j-1)] >= mu[(f, j)])
 
@@ -129,12 +129,12 @@ def setMuNodesCons(
 ):
     for feature in ensemble.features:
         if feature.ftype == FeatureType.NUMERICAL:
-            k = len(feature.levels)
             f = feature.id
+            k = len(feature.levels) + 2
             for j in range(1, k):
                 for t, tree in enumerate(ensemble):
                     for node in tree.getNodesWithFeature(f):
-                        if 0.5 * (1 + np.tanh(node.threshold)) == feature.levels[j]:
+                        if node.threshold == feature.levels[j-1]:
                             mdl.add_constraint_(mu[(f, j)] <= 1 - y[(t, node.left.id)])
                             mdl.add_constraint_(mu[(f, j-1)] >= y[(t, node.right.id)])
                             mdl.add_constraint_(mu[(f, j)] <= epsilon * y[(t, node.right.id)])
