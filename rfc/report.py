@@ -54,7 +54,7 @@ def report(dataset, ensembles = None):
             check = check_on_dataset(ensemble, cmp.sol, train_data)
             compression ,tie_train = check[0], check[1]
 
-        row = {'Ensemble' : ensemble_name, 'Train Dataset' : train_name, 'Test Dataset' : test_name, 'Original Size' : original_size, 'Compressed Size' : compressed_size, 'Compression Time' : compression_time, 'Accuracy on Train Dataset' : acc_train, 'Compression is Lossless for Train dataset' : compression, 'Lossless compression rate for test dataset': lossless_rate, 'Original accuracy on Test Dataset' : original_acc_test,'New accuracy on Test Dataset' : compressed_acc_test, 'Percentage of ties in train_set' : tie_train, 'Percentage of ties in test set': tie_test } #type:ignore
+        row = {'Ensemble' : ensemble_name, 'Train Dataset' : train_name, 'Test Dataset' : test_name, 'Original Size' : original_size, 'Compressed Size' : compressed_size, 'Compression Time' : compression_time, 'Accuracy on Train Dataset' : acc_train, 'Compression is Lossless for Train dataset' : compression, 'Percentage of ties in train_set' : tie_train, 'Lossless compression rate for test dataset': lossless_rate, 'Original accuracy on Test Dataset' : original_acc_test,'New accuracy on Test Dataset' : compressed_acc_test, 'Percentage of ties in test set': tie_test } #type:ignore
         df = df._append(row, ignore_index = True) #type:ignore
     df.to_csv(str(results_dir / dataset/ dataset)+f'_comp{int(1000*time())}.csv') 
     
