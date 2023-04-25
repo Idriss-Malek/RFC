@@ -135,7 +135,9 @@ class TreeEnsembleSeparator:
                     self.buildModel(u, c, g)
                     sol = self.mdl.solve()
                     if sol:
-                        pass
+                        if self.mdl.solution < 0: #type:ignore
+                            res[(c,g)] = np.array([self.x[i].solution_value for i in self.x.keys()])
+
                     else:
                         pass
                     self.clearModel()
