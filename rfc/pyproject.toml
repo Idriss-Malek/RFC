@@ -1,0 +1,28 @@
+[tool.poetry]
+name = 'rfc'
+version = '0.0.0'
+description = 'Tree Ensemble Compressor'
+authors = [
+    'Idris Malek', 'Youssouf Emine'
+]
+readme = 'README.md'
+
+licence = 'MIT'
+
+keywords = [
+    'tree', 'ensemble', 'compressor'
+]
+
+classifiers = [
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Development Status :: 5 - Production/Inactive",
+    "Programming Language :: Python :: 3.10",
+]
+
+[tool.poetry.dependencies]
+python = ">3.10"
+
+[tool.poetry.dev-dependencies]
+numpy = ">=1.24.2"
+pandas = ">=2.0.0"
+anytree = ">=2.8.0"
