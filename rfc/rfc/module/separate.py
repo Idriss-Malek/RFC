@@ -170,8 +170,6 @@ class TreeEnsembleSeparator:
                                 print(f'{z.name} : {z.solution_value}')
                             for zeta in self.zeta:
                                 print(f'{zeta.name} : {zeta.solution_value}')
-                            
-
 
                             res[(c, g)] = self.x.copy()
                     else:
