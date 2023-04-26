@@ -43,6 +43,13 @@ class Tree(Iterable[Node]):
     def getProbas(self, c: int):
         return np.array([(leaf.klass == c)+0. for leaf in self.getLeaves()], dtype=np.float32)
 
+    @property
+    def leaves(self) -> tuple[Node, ...]:
+        return self.root.leaves
+
+    def probas(self, c: int) -> list[float]:
+        return [leaf.p(c) for leaf in self.leaves]
+
     def getLeaves(self) -> Iterator[Node]:
         return self.root.leaves.__iter__()
 

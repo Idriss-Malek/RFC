@@ -4,6 +4,7 @@ import docplex.mp.dvar as cpv
 
 from ..structs.feature import FeatureType
 from ..structs.ensemble import TreeEnsemble
+from ..structs.tree import Tree
 
 epsilon = 1e-10
 
@@ -202,6 +203,24 @@ def getZ(
 ) -> list[cpv.Var]:
     return mdl.continuous_var_list(ensemble.n_classes)
 
+def getKlassProb(
+    mdl: cpx.Model,
+    tree: Tree,
+    y: dict[tuple[int, int], cpv.Var],
+    c: int
+):
+    p = tree.probas(c)
+    yl = [y[(tree.id, leaf.id)] for leaf in tree.leaves]
+    return mdl.dot(yl, p)
+
+def getKlassProbs(
+    mdl: cpx.Model,
+    ensemble: TreeEnsemble,
+    y: dict[tuple[int, int], cpv.Var],
+    c: int
+):
+    return [getKlassProb(mdl, tree, y, c) for tree in ensemble]
+
 def setZDefCons(
     mdl: cpx.Model,
     ensemble: TreeEnsemble,
@@ -211,11 +230,7 @@ def setZDefCons(
     w = ensemble.weights
     for c in range(ensemble.n_classes):
         z[c].set_name(f'z_{c}')
-        s = []
-        for t, tree in enumerate(ensemble):
-            p = tree.getProbas(c)
-            yl = [y[(t, node.id)] for node in tree.getLeaves()]
-            s.append(mdl.dot(yl, p))
+        s = getKlassProbs(mdl, ensemble, y, c)
         mdl.add_constraint_(z[c] == mdl.dot(s, w))
 
 def setZKlassCons(
@@ -244,20 +259,12 @@ def setZetaCons(
 ):
     w = ensemble.weights
     wu = w * u
-    s = []
-    for t, tree in enumerate(ensemble):
-        p = tree.getProbas(c)
-        yl = [y[(t, node.id)] for node in tree.getLeaves()]
-        s.append(mdl.dot(yl, p))
     zeta[0].set_name(f'zeta_{c}')
+    s = getKlassProbs(mdl, ensemble, y, c)
     mdl.add_constraint_(zeta[0] == mdl.dot(s, wu))
 
-    s = []
-    for t, tree in enumerate(ensemble):
-        p = tree.getProbas(g)
-        yl = [y[(t, node.id)] for node in tree.getLeaves()]
-        s.append(mdl.dot(yl, p))
     zeta[1].set_name(f'zeta_{g}')
+    s = getKlassProbs(mdl, ensemble, y, g)
     mdl.add_constraint_(zeta[1] == mdl.dot(s, wu))
 
 def setZetaObj(

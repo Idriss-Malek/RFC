@@ -44,7 +44,6 @@ class TreeEnsemble(Iterable[Tree]):
     def features(self, features: list[Feature]):
         self._features = features
 
-
     def getF(self, x: np.ndarray):
         F = np.empty((self.n_classes, self.__len__()))
         for c in range(self.n_classes):

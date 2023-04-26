@@ -142,6 +142,9 @@ class Node(BaseNode, NodeMixin):
         self._rightIdx = len(self.children)
         node.parent = self
 
+    def p(self, c: int) -> float:
+        return self.klass == c
+        
     def next(self, value: float | int | Any) -> "Node":
         if self.is_leaf:
             raise ValueError("Leaf node has no next.")
