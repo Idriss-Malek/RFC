@@ -94,6 +94,9 @@ def setYDepthCons(
         for d in range(tree.depth):
             y_ = [y[(t, node.left.id)] for node in tree.getNodesAtDepth(depth=d)]
             mdl.add_constraint_(sum(y_) <= lam[(t, d)])
+            y_ = [y[(t, node.right.id)] for node in tree.getNodesAtDepth(depth=d)]
+            mdl.add_constraint_(sum(y_) <= 1 - lam[(t, d)])
+            
 
 def getMu(
     mdl: cpx.Model,
@@ -207,6 +210,7 @@ def setZDefCons(
 ):
     w = ensemble.weights
     for c in range(ensemble.n_classes):
+        z[c].set_name(f'z_{c}')
         s = []
         for t, tree in enumerate(ensemble):
             p = tree.getProbas(c)
@@ -245,6 +249,7 @@ def setZetaCons(
         p = tree.getProbas(c)
         yl = [y[(t, node.id)] for node in tree.getLeaves()]
         s.append(mdl.dot(yl, p))
+    zeta[0].set_name(f'zeta_{c}')
     mdl.add_constraint_(zeta[0] == mdl.dot(s, wu))
 
     s = []
@@ -252,10 +257,14 @@ def setZetaCons(
         p = tree.getProbas(g)
         yl = [y[(t, node.id)] for node in tree.getLeaves()]
         s.append(mdl.dot(yl, p))
+    zeta[1].set_name(f'zeta_{g}')
     mdl.add_constraint_(zeta[1] == mdl.dot(s, wu))
 
 def setZetaObj(
     mdl: cpx.Model,
     zeta: list[cpv.Var]
 ):
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    print(zeta[0].name)
+    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
     mdl.minimize(zeta[0] - zeta[1])
