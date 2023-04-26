@@ -177,12 +177,12 @@ def getXi(
     for feature in ensemble.features:
         if feature.ftype == FeatureType.BINARY:
             keys.append(feature.id)
-    return mdl.binary_var_dict(keys, name='x')
+    return mdl.binary_var_dict(keys, name='xi')
 
 def setXiBinaryCons(
     mdl: cpx.Model,
     ensemble: TreeEnsemble,
-    x: dict[int, cpv.Var],
+    xi: dict[int, cpv.Var],
     y: dict[tuple[int, int], cpv.Var],
 ):
     for feature in ensemble.features:
@@ -190,14 +190,14 @@ def setXiBinaryCons(
             f = feature.id
             for t, tree in enumerate(ensemble):
                 for node in tree.getNodesWithFeature(f):
-                    mdl.add_constraint_(x[f] <= 1 - y[(t, node.left.id)])
-                    mdl.add_constraint_(x[f] >= y[(t, node.right.id)])
+                    mdl.add_constraint_(xi[f] <= 1 - y[(t, node.left.id)])
+                    mdl.add_constraint_(xi[f] >= y[(t, node.right.id)])
 
 def getZ(
     mdl: cpx.Model,
     ensemble: TreeEnsemble
 ) -> list[cpv.Var]:
-    return mdl.binary_var_list(ensemble.n_classes)
+    return mdl.continuous_var_list(ensemble.n_classes)
 
 def setZDefCons(
     mdl: cpx.Model,
@@ -211,8 +211,8 @@ def setZDefCons(
         for t, tree in enumerate(ensemble):
             p = tree.getProbas(c)
             yl = [y[(t, node.id)] for node in tree.getLeaves()]
-            s.append(mdl.dot(p, yl))
-        mdl.add_constraint_(z[c] == mdl.dot(w, s))
+            s.append(mdl.dot(yl, p))
+        mdl.add_constraint_(z[c] == mdl.dot(s, w))
 
 def setZKlassCons(
     mdl: cpx.Model,
@@ -227,7 +227,7 @@ def setZKlassCons(
 def getZeta(
     mdl: cpx.Model
 ) -> list[cpv.Var]:
-    return mdl.binary_var_list(2)
+    return mdl.continuous_var_list(2)
 
 def setZetaCons(
     mdl: cpx.Model,
@@ -236,7 +236,7 @@ def setZetaCons(
     y: dict[tuple[int, int], cpv.Var],
     u: np.ndarray,
     c: int,
-    cc: int
+    g: int
 ):
     w = ensemble.weights
     wu = w * u
@@ -244,15 +244,15 @@ def setZetaCons(
     for t, tree in enumerate(ensemble):
         p = tree.getProbas(c)
         yl = [y[(t, node.id)] for node in tree.getLeaves()]
-        s.append(mdl.dot(p, yl))
-    mdl.add_constraint_(zeta[0] == mdl.dot(wu, s))
+        s.append(mdl.dot(yl, p))
+    mdl.add_constraint_(zeta[0] == mdl.dot(s, wu))
 
     s = []
     for t, tree in enumerate(ensemble):
-        p = tree.getProbas(cc)
+        p = tree.getProbas(g)
         yl = [y[(t, node.id)] for node in tree.getLeaves()]
-        s.append(mdl.dot(p, yl))
-    mdl.add_constraint_(zeta[1] == mdl.dot(wu, s))
+        s.append(mdl.dot(yl, p))
+    mdl.add_constraint_(zeta[1] == mdl.dot(s, wu))
 
 def setZetaObj(
     mdl: cpx.Model,

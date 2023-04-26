@@ -155,11 +155,17 @@ class TreeEnsembleSeparator:
                         float_precision=precision
                     )
                     self.buildModel(u, c, g)
+                    if log_output: self.mdl.print_information()
                     sol = self.mdl.solve()
                     if sol:
+                        if log_output:
+                            self.mdl.report()
                         if self.mdl.objective_value < 0:
                             self.updateX()
-                            res[(c, g)] = self.x
+                            cc = np.argmax(self.ensemble.getF(self.x).dot(self.ensemble.weights))
+                            gg = np.argmax(self.ensemble.getF(self.x).dot(self.ensemble.weights * u))
+                            print(self.ensemble.getF(self.x).dot(self.ensemble.weights), self.ensemble.getF(self.x).dot(self.ensemble.weights * u))
+                            res[(c, g)] = self.x.copy()
                     else:
                         pass
                     self.clearModel()

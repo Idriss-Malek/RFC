@@ -79,8 +79,8 @@ class TreeEnsembleCompressor:
 
         log_output = kwargs.get('log_output', False)
         if not isinstance(log_output, bool):
-            raise TypeError('log_output must be a boolean')
-        
+            raise TypeError('log_output must be a boolean')        
+
         precision = kwargs.get('precision', 8)
         if not isinstance(precision, int):
             raise TypeError('precision must be an integer')
@@ -105,7 +105,8 @@ class TreeEnsembleCompressor:
                 break        
             sol = self.mdl.solve()
             if sol:
-                if log_output: self.mdl.report()
+                if log_output:
+                    self.mdl.report()
                 self.updateSol()
                 if self.mdl.objective_value == len(self.ensemble):
                     break

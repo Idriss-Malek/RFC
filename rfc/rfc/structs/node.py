@@ -152,5 +152,4 @@ class Node(BaseNode, NodeMixin):
             case FeatureType.CATEGORICAL:
                 return self.left if (value in self.categories) else self.right
             case FeatureType.NUMERICAL:
-                assert self._threshold is not None
                 return self.left if value <= self.threshold else self.right
