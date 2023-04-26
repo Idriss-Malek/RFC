@@ -140,7 +140,7 @@ def setMuNodesCons(
                         if node.threshold == feature.levels[j-1]:
                             mdl.add_constraint_(mu[(f, j)] <= 1 - y[(t, node.left.id)])
                             mdl.add_constraint_(mu[(f, j-1)] >= y[(t, node.right.id)])
-                            mdl.add_constraint_(mu[(f, j)] <= epsilon * y[(t, node.right.id)])
+                            mdl.add_constraint_(mu[(f, j)] >= epsilon * y[(t, node.right.id)])
 
 def getNu(
     mdl: cpx.Model,

@@ -41,7 +41,7 @@ class Tree(Iterable[Node]):
         return PreOrderIter(self.root, filter_=filter__)
 
     def getProbas(self, c: int):
-        return np.array([leaf.klass == c for leaf in self.getLeaves()], dtype=np.float32)
+        return np.array([(leaf.klass == c)+0. for leaf in self.getLeaves()], dtype=np.float32)
 
     def getLeaves(self) -> Iterator[Node]:
         return self.root.leaves.__iter__()
