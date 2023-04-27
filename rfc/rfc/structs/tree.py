@@ -63,7 +63,7 @@ class Tree(Iterable[Node]):
         self,
         feature: int
     ) -> Iterator[Node]:
-        return self.getNodes(lambda node: node.feature == feature)
+        return self.getNodes(lambda node: node.feature.id == feature)
 
     def __iter__(self) -> Iterator[Node]:
         return PreOrderIter(self.root)
