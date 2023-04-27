@@ -176,7 +176,7 @@ class TreeEnsembleSeparator:
                             Xs.append(self.x)
                             for f in range(len(self.ensemble.features)):
                                 for t, tree in enumerate(self.ensemble):
-                                    for node in tree.getNodesWithFeature(5):
+                                    for node in tree.getNodesWithFeature(f):
                                         print('OOOOOOOOOOOO')
                                         print(self.y[(t, node.left.id)])
                                         print(self.y[(t, node.right.id)])
