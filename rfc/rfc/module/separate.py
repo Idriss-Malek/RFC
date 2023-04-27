@@ -146,6 +146,8 @@ class TreeEnsembleSeparator:
             raise TypeError('precision must be an integer')
         
         res = {}
+        Ys = []
+        Xs = []
         for c in range(self.ensemble.n_classes):
             for g in range(self.ensemble.n_classes):
                 if c != g :
@@ -170,9 +172,12 @@ class TreeEnsembleSeparator:
                                 print(f'{z.name} : {z.solution_value}')
                             for zeta in self.zeta:
                                 print(f'{zeta.name} : {zeta.solution_value}')
-
+                            Ys.append([y.solution_value for key,y in self.y.items()])
+                            Xs.append(self.x)
                             res[(c, g)] = self.x.copy()
                     else:
                         pass
                     self.clearModel()
+        print('y : ',Ys[0] == Ys[1])
+        print('x : ',Xs[0] == Xs[1])
         return res
