@@ -143,7 +143,7 @@ class Node(BaseNode, NodeMixin):
         node.parent = self
 
     def p(self, c: int) -> float:
-        return self.klass == c
+        return (self.klass == c)+0.
         
     def next(self, value: float | int | Any) -> "Node":
         if self.is_leaf:
