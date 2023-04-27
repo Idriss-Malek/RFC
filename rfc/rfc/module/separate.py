@@ -174,6 +174,13 @@ class TreeEnsembleSeparator:
                                 print(f'{zeta.name} : {zeta.solution_value}')
                             Ys.append([y.solution_value for key,y in self.y.items()])
                             Xs.append(self.x)
+                            for f in range(len(self.ensemble.features)):
+                                for t, tree in enumerate(self.ensemble):
+                                    for node in tree.getNodesWithFeature(5):
+                                        print('OOOOOOOOOOOO')
+                                        print(self.y[(t, node.left.id)])
+                                        print(self.y[(t, node.right.id)])
+                                        print('OOOOOOOOOOO')
                             res[(c, g)] = self.x.copy()
                     else:
                         pass
