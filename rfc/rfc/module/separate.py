@@ -179,5 +179,5 @@ class TreeEnsembleSeparator:
                         pass
                     self.clearModel()
         print('y : ',Ys[0] == Ys[1])
-        print('x : ',Xs[0] == Xs[1])
+        print('x : ',bool(sum(Xs[0] == Xs[1])))
         return res
