@@ -271,7 +271,4 @@ def setZetaObj(
     mdl: cpx.Model,
     zeta: list[cpv.Var]
 ):
-    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-    print(zeta[0].name)
-    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
     mdl.minimize(zeta[0] - zeta[1])

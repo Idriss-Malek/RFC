@@ -146,8 +146,7 @@ class TreeEnsembleSeparator:
             raise TypeError('precision must be an integer')
         
         res = {}
-        Ys = []
-        Xs = []
+
         for c in range(self.ensemble.n_classes):
             for g in range(self.ensemble.n_classes):
                 if c != g :
@@ -164,27 +163,15 @@ class TreeEnsembleSeparator:
                             self.mdl.report()
                         if self.mdl.objective_value < 0:
                             self.updateX()
-                            cc = np.argmax(self.ensemble.getF(self.x).dot(self.ensemble.weights))
-                            gg = np.argmax(self.ensemble.getF(self.x).dot(self.ensemble.weights * u))
                             print(self.ensemble.getF(self.x).dot(self.ensemble.weights), self.ensemble.getF(self.x).dot(self.ensemble.weights * u))
                             print(self.x)
                             for z in self.z:
                                 print(f'{z.name} : {z.solution_value}')
                             for zeta in self.zeta:
                                 print(f'{zeta.name} : {zeta.solution_value}')
-                            Ys.append([y.solution_value for key,y in self.y.items()])
-                            Xs.append(self.x)
-                            for f in range(len(self.ensemble.features)):
-                                for t, tree in enumerate(self.ensemble):
-                                    for node in tree.getNodesWithFeature(f):
-                                        print('OOOOOOOOOOOO')
-                                        print(self.y[(t, node.left.id)])
-                                        print(self.y[(t, node.right.id)])
-                                        print('OOOOOOOOOOO')
+
                             res[(c, g)] = self.x.copy()
                     else:
                         pass
                     self.clearModel()
-        print('y : ',Ys[0] == Ys[1])
-        print('x : ',bool(sum(Xs[0] == Xs[1])))
         return res

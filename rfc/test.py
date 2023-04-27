@@ -13,7 +13,7 @@ if __name__ == '__main__':
     ensemble = str(ensemble)
     ensemble = load_tree_ensemble(ensemble, log_output=False)
     cmp = TreeEnsembleCompressor(ensemble, dataset, lazy=True)
-    cmp.compress(on='full', log_output=True, precision=8, m_iterations=1)
+    cmp.compress(on='full', log_output=True, precision=8, m_iterations=10)
     if cmp.status != TreeEnsembleCompressorStatus.OPTIMAL:
         print('Solver did not find any solution.')
     elif check_on_dataset(ensemble, cmp.sol, dataset):

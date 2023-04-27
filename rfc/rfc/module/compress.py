@@ -107,6 +107,7 @@ class TreeEnsembleCompressor:
             if sol:
                 if log_output:
                     self.mdl.report()
+                    print(self.mdl.solution)
                 self.updateSol()
                 if self.mdl.objective_value == len(self.ensemble):
                     break
