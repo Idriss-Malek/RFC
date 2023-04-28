@@ -97,13 +97,12 @@ class TreeEnsembleCompressor:
         self.buildModel()
         if log_output:
             self.mdl.print_information()
-
+        sol = self.mdl.solve()
         iteration = 0
         while True:
             if m_iterations is not None and iteration >= m_iterations:
                 self.status = TreeEnsembleCompressorStatus.MAX_ITERATIONS
                 break        
-            sol = self.mdl.solve()
             if sol:
                 if log_output:
                     self.mdl.report()
@@ -126,7 +125,9 @@ class TreeEnsembleCompressor:
                     else:
                         for x in res.values():
                             self.addUCons(x)
+                        sol = self.mdl.solve()
             else:
                 self.status = TreeEnsembleCompressorStatus.INFEASIBLE
                 break
             iteration += 1
+        
