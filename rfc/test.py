@@ -13,7 +13,8 @@ if __name__ == '__main__':
     ensemble = str(ensemble)
     ensemble = load_tree_ensemble(ensemble, log_output=False)
     cmp = TreeEnsembleCompressor(ensemble, dataset, lazy=True)
-    cmp.compress(on='full', log_output=True, precision=8, m_iterations=10)
+    cmp.compress(on='full', log_output=False, precision=8, m_iterations=100)
+    print('Final number of trees in the compressed model : ',cmp.mdl.objective_value)
     if cmp.status != TreeEnsembleCompressorStatus.OPTIMAL:
         print('Solver did not find any solution.')
     elif check_on_dataset(ensemble, cmp.sol, dataset):
