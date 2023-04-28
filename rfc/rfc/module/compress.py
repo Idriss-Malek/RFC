@@ -100,6 +100,7 @@ class TreeEnsembleCompressor:
         sol = self.mdl.solve()
         iteration = 0
         while True:
+            print(f'Iteration {iteration}/{m_iterations}')
             if m_iterations is not None and iteration >= m_iterations:
                 self.status = TreeEnsembleCompressorStatus.MAX_ITERATIONS
                 break        
@@ -130,4 +131,5 @@ class TreeEnsembleCompressor:
                 self.status = TreeEnsembleCompressorStatus.INFEASIBLE
                 break
             iteration += 1
+            print('Number of trees in the compressed forest so far : ',self.mdl.objective_value)
         
