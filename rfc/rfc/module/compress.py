@@ -5,10 +5,10 @@ from enum import Enum
 import docplex.mp.model as cpx
 import docplex.mp.dvar as cpv
 
-from .cplex import *
+from .model import *
 
 from .separate import TreeEnsembleSeparator
-from ..structs.ensemble import TreeEnsemble
+from ..structs.ensemble import Ensemble
 
 class TreeEnsembleCompressorStatus(Enum):
     OPTIMAL = 'optimal'
@@ -19,7 +19,7 @@ class TreeEnsembleCompressorStatus(Enum):
 
 class TreeEnsembleCompressor:
     dataset: pd.DataFrame
-    ensemble: TreeEnsemble
+    ensemble: Ensemble
     mdl: cpx.Model
     sep: TreeEnsembleSeparator
     u: list[cpv.Var]
@@ -29,11 +29,11 @@ class TreeEnsembleCompressor:
 
     def __init__(
         self,
-        ensemble: TreeEnsemble,
+        ensemble: Ensemble,
         dataset: pd.DataFrame,
         lazy: bool = False
     ) -> None:
-        if not isinstance(ensemble, TreeEnsemble):
+        if not isinstance(ensemble, Ensemble):
             raise TypeError('ensemble must be a TreeEnsemble')
 
         if not isinstance(dataset, pd.DataFrame):

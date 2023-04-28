@@ -39,7 +39,7 @@ def report(dataset, ensembles = None):
         cmp.compress(on='train', log_output=True, precision=8)
         compression_time=process_time()-t1
 
-        original_size = len(ensemble.trees)
+        original_size = len(ensemble.__trees)
         compressed_size = sum(cmp.sol)
         lossless_rate, tie_test = rate_on_dataset(ensemble, cmp.sol, test_data)
 

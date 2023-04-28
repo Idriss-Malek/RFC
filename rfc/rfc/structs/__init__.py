@@ -1,6 +1,6 @@
 from .feature import Feature, FeatureType
 from .node import Node
 from .tree import Tree
-from .ensemble import TreeEnsemble
+from .ensemble import Ensemble
 
-__all__ = ['Feature', 'FeatureType', 'Node', 'Tree', 'TreeEnsemble']
+__all__ = ['Feature', 'FeatureType', 'Node', 'Tree', 'Ensemble']

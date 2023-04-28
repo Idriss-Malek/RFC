@@ -1,17 +1,17 @@
 import numpy as np
 import pandas as pd
 
-from ..structs import TreeEnsemble
+from ..structs import Ensemble
 
 def check_on_x(
-    ensemble: TreeEnsemble,
+    ensemble: Ensemble,
     u: np.ndarray,
     x: np.ndarray,
     tie: bool = True
 ) -> list[bool]:
     w = ensemble.weights
     wu = u * w
-    F = ensemble.getF(x)
+    F = ensemble.F(x)
     c = np.argmax(F.dot(w))
     max_wu = max(F.dot(wu))
     if tie:
@@ -20,7 +20,7 @@ def check_on_x(
         return [c == np.argmax(F.dot(wu)),np.count_nonzero(F.dot(wu) == max_wu) >= 2]
 
 def check_on_dataset(
-    ensemble: TreeEnsemble,
+    ensemble: Ensemble,
     u: np.ndarray,
     dataset: pd.DataFrame
 ) -> list[bool | float]:
@@ -33,7 +33,7 @@ def check_on_dataset(
     return [True, tie/len(dataset)]
 
 def rate_on_dataset(
-    ensemble: TreeEnsemble,
+    ensemble: Ensemble,
     u: np.ndarray,
     dataset: pd.DataFrame
 ):
@@ -47,17 +47,17 @@ def rate_on_dataset(
     return correct / all, tie / all
 
 def accuracy(
-        ensemble: TreeEnsemble,
+        ensemble: Ensemble,
         dataset: pd.DataFrame,
         u: None | np.ndarray = None
 ) -> float:
     if u is None:
-        u = np.ones(len(ensemble.trees))
+        u = np.ones(len(ensemble.__trees))
     w = ensemble.weights
     wu = u * w
     acc=[]
     for _, x in dataset.iterrows():
-        F = ensemble.getF(x)# type: ignore
+        F = ensemble.F(np.array(x.values)) 
         c = np.argmax(F.dot(wu))
         if c == x[-1]:
             acc.append(1)

@@ -1,158 +1,235 @@
 from typing import Any
 from anytree import NodeMixin
+from anytree import TreeError
+from collections.abc import Iterable
 
+from ..types import *
 from .feature import Feature, FeatureType
 
 class BaseNode(object):
     pass
 
-class Node(BaseNode, NodeMixin):
-    id: int
+class Node(IdentifiedObject, BaseNode, NodeMixin):
     name: str
-    _feature: None | Feature = None
-    _threshold: None | float = None
-    _categories: None | list[Any] = None
-    _leftIdx: None | int = None
-    _rightIdx: None | int = None
-    _klass: None | int = None
+    __feature: Feature
+    __threshold: float
+    __categories: tuple
+    __klass: int
 
+    """
+    Node of a decision tree. A node can be either a leaf or an internal node.
+    
+    An internal node has a feature, two children. If the feature is numerical,
+    a threshold is also defined. If the feature is categorical, a list of
+    categories is defined.
+    
+    A leaf node has a class.
+    """
     def __init__(
         self,
         id_: int,
         name: None | str = None,
         feature: None | Feature = None,
         threshold: None | float = None,
-        values: None | list[Any] = None,
+        categories: None | Iterable[Any] = None,
         klass: None | int = None,
         parent = None,
-        children: None | tuple = None,
+        left = None,
+        right = None,
     ) -> None:
         super(Node, self).__init__()
         self.id = id_
         self.name = name if name is not None else f'Node {id_}'
         self.parent = parent
-        if children:  # Set children only if they are not None
-            if len(children) > 2:
-                raise ValueError("Binary node can only have two children.")
-            if len(children) >= 1:
-                self._leftIdx = 0
-            if len(children) == 2:
-                self._rightIdx = 1
-            self.children = children
-        if feature is not None:
-            self.feature = feature
-        if threshold is not None:
-            self.threshold = threshold
-        if values is not None:
-            self.categories = values
-        if klass is not None:
-            self.klass = klass
+        if left: self.left = left
+        if right: self.right = right
+        if feature: self.__feature = feature
+        if threshold: self.__threshold = threshold
+        if categories: self.__categories = tuple(categories)
+        if klass: self.__klass = klass
 
     @property
     def feature(self) -> Feature:
         if self.is_leaf:
-            raise ValueError("Leaf node has no feature!")
-        if self._feature is None:
-            raise ValueError("Node has no feature!")
-        return self._feature
+            msg = "Cannot get the feature of a leaf node!"
+            raise AttributeError(msg)
+        try:
+            return self.__feature
+        except AttributeError:
+            msg = "The feature of this node is not defined!"
+            raise AttributeError(msg)
 
     @feature.setter
     def feature(self, feature: Feature):
         if self.is_leaf:
-            raise ValueError("Leaf node has no feature!")
-        self._feature = feature
+            msg = "Cannot set a feature for a leaf node!"
+            raise AttributeError(msg)
+
+        try:
+            self.__feature
+            msg = "The feature of this node is already defined!"
+            raise AttributeError(msg)
+        except AttributeError:
+            self.__feature = feature
 
     @property
     def threshold(self) -> float:
         if self.is_leaf:
-            raise ValueError("Leaf node has no threshold!")
-        if self.feature.ftype != FeatureType.NUMERICAL:
-            raise ValueError("Threshold is only defined for numerical features!")
-        if self._threshold is None:
-            raise ValueError("Node has no threshold!")
-        return self._threshold
+            msg = "Cannot get the threshold of a leaf node!"
+            raise AttributeError(msg)
+
+        if not self.feature.isnumerical():
+            msg = "Cannot get the threshold of a non-numerical feature node!"
+            raise AttributeError(msg)
+
+        try:
+            return self.__threshold
+        except AttributeError:
+            msg = "The threshold of this node is not defined!"
+            raise AttributeError(msg)
 
     @threshold.setter
     def threshold(self, threshold: float):
         if self.is_leaf:
-            raise ValueError("Leaf node has no threshold!")
-        if self.feature.ftype != FeatureType.NUMERICAL:
-            raise ValueError("Threshold is only defined for numerical features!")
-        self._threshold = threshold
+            msg = "Cannot set a threshold for a leaf node!"
+            raise AttributeError(msg)
+
+        if not self.feature.isnumerical():
+            msg = "Cannot set a threshold for a non-numerical feature node!"
+            raise AttributeError(msg)
+
+        self.__threshold = threshold
 
     @property
-    def categories(self) -> list[Any]:
+    def categories(self) -> tuple[Any]:
         if self.is_leaf:
-            raise ValueError("Leaf node has no categories!")
-        if self.feature.ftype != FeatureType.CATEGORICAL:
-            raise ValueError("categories are only defined for categorical features!")
-        if self._categories is None:
-            raise ValueError("Node has no categories!")
-        return self._categories
+            msg = "Cannot get the categories of a leaf node!"
+            raise AttributeError(msg)
+
+        if not self.feature.iscategorical():
+            msg = "Cannot get the categories of a non-categorical feature node!"
+            raise AttributeError(msg)
+
+        try:
+            return self.__categories
+        except AttributeError:
+            msg = "The categories of this node are not defined!"
+            raise AttributeError(msg)
 
     @categories.setter
-    def categories(self, values: list[Any]):
+    def categories(self, categories: Iterable[Any]):
         if self.is_leaf:
-            raise ValueError("Leaf node has no categories!")
-        if self.feature.ftype != FeatureType.CATEGORICAL:
-            raise ValueError("Categories are only defined for categorical features!")
-        self._categories = values
+            msg = "Cannot set categories for a leaf node!"
+            raise AttributeError(msg)
+
+        if not self.feature.iscategorical():
+            msg = "Cannot set categories for a non-categorical feature node!"
+            raise AttributeError(msg)
+        
+        self.__categories = tuple(categories)
 
     @property
     def klass(self) -> int:
         if not self.is_leaf:
-            raise ValueError("Node is not a leaf!")
-        if self._klass is None:
-            raise ValueError("Leaf node has no class!")
-        return self._klass
+            msg = "Cannot get the class of a non-leaf node!"
+            raise AttributeError(msg)
+
+        try:
+            return self.__klass
+        except AttributeError:
+            msg = "The class of this leaf is not defined!"
+            raise AttributeError(msg)
 
     @klass.setter
     def klass(self, klass: int):
         if not self.is_leaf:
-            raise ValueError("Node is not a leaf!")
-        self._klass = klass
+            msg = "Cannot set a class for a non-leaf node!"
+            raise AttributeError(msg)
+        self.__klass = klass
 
     @property
-    def left(self) -> "Node":
-        if self._leftIdx is None:
-            raise ValueError("No left child!")
-        return self.children[self._leftIdx]
+    def left(self):
+        if self.is_leaf:
+            msg = "Cannot get the left child of a leaf node!"
+            raise TreeError(msg)
+        return self.__left
 
     @left.setter
-    def left(self, node: "Node"):
-        if self._leftIdx is not None:
-            raise ValueError("Node has already a left child!")
-        if len(self.children) > 2:
-            raise ValueError("Node has already two children!")
-        self._leftIdx = len(self.children)
-        node.parent = self
+    def left(self, node):
+        try:
+            left = self.__left
+        except AttributeError:
+            left = None
+        if left is not node:
+            self.__detach_child(left)
+            self.__attach_child(node)
+            self.__left = node
+
+    @left.deleter
+    def left(self):
+        try:
+            left = self.__left
+        except AttributeError:
+            left = None
+        self.__detach_child(left)
 
     @property
-    def right(self) -> "Node":
-        if self._rightIdx is None:
-            raise ValueError("No right child!")
-        return self.children[self._rightIdx]
+    def right(self):
+        if self.is_leaf:
+            msg = "Cannot get the right child of a leaf node!"
+            raise TreeError(msg)
+        return self.__right
 
     @right.setter
-    def right(self, node: "Node"):
-        if self._rightIdx is not None:
-            raise ValueError("Node has already a right child!")
-        if len(self.children) > 2:
-            raise ValueError("Node has already two children!")
-        self._rightIdx = len(self.children)
-        node.parent = self
+    def right(self, node):
+        try:
+            right = self.__right
+        except AttributeError:
+            right = None
+        if right is not node:
+            self.__detach_child(right)
+            self.__attach_child(node)
+            self.__right = node
 
     def p(self, c: int) -> float:
-        return (self.klass == c)+0.
-        
-    def next(self, value: float | int | Any) -> "Node":
-        if self.is_leaf:
-            raise ValueError("Leaf node has no next.")
+        return 0.0 + (self.klass == c)
 
-        match self.feature.ftype:
-            case FeatureType.BINARY:
-                return self.left if value == 0 else self.right
+    def __f(self, value) -> bool:
+        match self.feature.type:
             case FeatureType.CATEGORICAL:
-                return self.left if (value in self.categories) else self.right
+                return value in self.categories
             case FeatureType.NUMERICAL:
-                return self.left if value <= self.threshold else self.right
+                return value <= self.threshold
+            case FeatureType.BINARY:
+                return value == 0
+
+    def split_on(self, f: int | Feature) -> bool:
+        return self.feature.id == f if isinstance(f, int) else self.feature == f
+
+    def split(self, x: Sample):
+        v = self.feature.value(x)
+        return self.__split(v)
+
+    def __split(self, value: float | int | Any):
+        if self.is_leaf:
+            msg = "Cannot split a leaf node!"
+            raise ValueError(msg)
+        return self.left if self.__f(value) else self.right
+
+    def __detach_child(self, child):
+        if child is not None:
+            self.children = (node for node in self.children if node is not child)
+            child.parent = None
+
+    def __attach_child(self, child):
+        if child is not None: child.parent = self
+
+    def __repr__(self) -> str:
+        if self.is_leaf:
+            return f"<Leaf id={self.id}, name={self.name}, class={self.klass}>"
+        elif self.feature.isnumerical():
+            return f"<Node id={self.id}, name={self.name}, feature={self.feature}, thr={self.threshold}>"
+        elif self.feature.iscategorical():
+            return f"<Node id={self.id}, name={self.name}, feature={self.feature}, cats={self.categories}>"
+        else:
+            return f"<Node id={self.id}, name={self.name}, feature={self.feature}>"

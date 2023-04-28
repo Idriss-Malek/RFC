@@ -6,3 +6,4 @@ if __name__ == '__main__':
     path = root / 'forests/Breast-Cancer-Wisconsin/Breast-Cancer-Wisconsin.RF8.txt'
     path = str(path)
     ensemble = load_tree_ensemble(path, log_output=True)
+    print(ensemble.features)

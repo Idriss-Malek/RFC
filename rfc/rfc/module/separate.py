@@ -1,8 +1,8 @@
-from .cplex import *
-from ..structs.ensemble import TreeEnsemble
+from .model import *
+from ..structs.ensemble import Ensemble
 
 class TreeEnsembleSeparator:
-    ensemble: TreeEnsemble
+    ensemble: Ensemble
     mdl: cpx.Model
     y: dict[tuple[int, int], cpv.Var]
     lam: dict[tuple[int, int], cpv.Var]
@@ -17,7 +17,7 @@ class TreeEnsembleSeparator:
     
     def __init__(
         self,
-        ensemble: TreeEnsemble,
+        ensemble: Ensemble,
         epsilon: float = 1e-10  
     ) -> None:
         self.ensemble = ensemble
@@ -74,7 +74,7 @@ class TreeEnsembleSeparator:
         self.x = np.zeros(n_features)
         for feature in self.ensemble.features:
             f = feature.id
-            match feature.ftype:
+            match feature.type:
                 case FeatureType.BINARY:
                     self.x[f] = self.xi[f].solution_value    
                 case FeatureType.NUMERICAL:
@@ -163,7 +163,7 @@ class TreeEnsembleSeparator:
                             self.mdl.report()
                         if self.mdl.objective_value < 0:
                             self.updateX()
-                            print(self.ensemble.getF(self.x).dot(self.ensemble.weights), self.ensemble.getF(self.x).dot(self.ensemble.weights * u))
+                            print(self.ensemble.F(self.x).dot(self.ensemble.weights), self.ensemble.F(self.x).dot(self.ensemble.weights * u))
                             print(self.x)
                             for z in self.z:
                                 print(f'{z.name} : {z.solution_value}')
