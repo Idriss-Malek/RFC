@@ -132,4 +132,5 @@ class TreeEnsembleCompressor:
                 break
             iteration += 1
             print('Number of trees in the compressed forest so far : ',self.mdl.objective_value)
+        return iteration
         
