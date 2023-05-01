@@ -1,0 +1,11 @@
+,Ensemble,Base Dataset,Original Size,Compressed Size,Compression Time,Reached Optimal ,Number of iterations,Reached Optimal
+0,Seeds.RF10.txt,Seeds.train10.csv,100,2,15.264908647999619,,1,False
+1,Seeds.RF9.txt,Seeds.train9.csv,100,2,698.8980261039997,,1,False
+2,Seeds.RF7.txt,Seeds.train7.csv,100,2,18.10306614199999,,1,False
+3,Seeds.RF6.txt,Seeds.train6.csv,100,2,1615.9055862959995,,1,False
+4,Seeds.RF1.txt,Seeds.train1.csv,100,2,802.5177003479994,,1,False
+5,Seeds.RF8.txt,Seeds.train8.csv,100,2,4068.751820173,,1,False
+6,Seeds.RF2.txt,Seeds.train2.csv,100,2,7.522988292999798,,1,False
+7,Seeds.RF5.txt,Seeds.train5.csv,100,2,1515.7621983860008,,1,False
+8,Seeds.RF4.txt,Seeds.train4.csv,100,2,766.6649091050003,,1,False
+9,Seeds.RF3.txt,Seeds.train3.csv,100,2,2794.4104461489987,,1,False

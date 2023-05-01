@@ -1,0 +1,4 @@
+,Ensemble,Base Dataset,Original Size,Compressed Size,Compression Time,Reached Optimal ,Number of iterations,Reached Optimal
+0,FICO.RF7.txt,FICO.train7.csv,100,88,335418.987332122,,1000,False
+1,FICO.RF9.txt,FICO.train9.csv,100,90,1348470.0613124708,,1000,False
+2,FICO.RF10.txt,FICO.train10.csv,100,84,280922.715703303,,1000,False

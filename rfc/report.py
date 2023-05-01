@@ -22,7 +22,8 @@ def report(dataset, ensembles = None):
 
     #df = pd.DataFrame(columns=['Ensemble', 'Train Dataset', 'Test Dataset','Original Size', 'Compressed Size', 'Compression Time', 'Accuracy on Train Dataset', 'Compression is Lossless for Train dataset','Percentage of ties in train set', 'Lossless compression rate for test dataset', 'Original accuracy on Test Dataset', 'New accuracy on Test Dataset', 'Percentage of ties in test set'])
     df = pd.DataFrame(columns=['Ensemble', 'Base Dataset', 'Original Size', 'Compressed Size', 'Compression Time', 'Reached Optimal ', 'Number of iterations'])
-
+    link_csv=str(results_dir / dataset/ dataset)+f'_full_comp{int(1000*time())}.csv'
+    df.to_csv(link_csv) 
     for ensemble in ensembles:
         ensemble_name = ensemble[len(str(rf_dir / dataset))+1:]
         with open(ensemble) as f:
@@ -40,7 +41,7 @@ def report(dataset, ensembles = None):
         cmp = TreeEnsembleCompressor(ensemble, full_data)
         
         t1=process_time()
-        n_iterations = cmp.compress(on='full', log_output=False, precision=8, m_iterations=1)
+        n_iterations = cmp.compress(on='full', log_output=False, precision=8, m_iterations=1000)
         compression_time=process_time()-t1
 
         original_size = len(ensemble.trees)
@@ -60,7 +61,7 @@ def report(dataset, ensembles = None):
 
         row = {'Ensemble' : ensemble_name, 'Base Dataset' : full_name, 'Original Size' : original_size, 'Compressed Size' : compressed_size, 'Compression Time' : compression_time, 'Reached Optimal': reached, 'Number of iterations' : n_iterations} #type:ignore
         df = df._append(row, ignore_index = True) #type:ignore
-    df.to_csv(str(results_dir / dataset/ dataset)+f'_full_comp{int(1000*time())}.csv') 
+        df.to_csv(link_csv)
     
     
 
