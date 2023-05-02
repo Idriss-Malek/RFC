@@ -162,17 +162,19 @@ class TreeEnsembleSeparator:
                         if log_output:
                             self.mdl.report()
                         if self.mdl.objective_value < 0:
+                            print('SEP VAL : ' ,self.mdl.objective_value )
                             self.updateX()
-                            '''
+                            
                             print(self.ensemble.getF(self.x).dot(self.ensemble.weights), self.ensemble.getF(self.x).dot(self.ensemble.weights * u))
                             print(self.x)
                             for z in self.z:
                                 print(f'{z.name} : {z.solution_value}')
                             for zeta in self.zeta:
                                 print(f'{zeta.name} : {zeta.solution_value}')
-                            '''
+                            
                             res[(c, g)] = self.x.copy()
                     else:
                         pass
                     self.clearModel()
+        print('LEN sep : ', len(res))
         return res

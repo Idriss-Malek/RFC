@@ -67,9 +67,4 @@ def report(dataset, ensembles = None):
 
 if __name__ == "__main__":
     report('FICO')
-    report('Pima-Diabetes')
-    report('Seeds')
-    report('COMPAS-ProPublica')
-    report('HTRU2')
-    report('Breast-Cancer-Wisconsin')
     

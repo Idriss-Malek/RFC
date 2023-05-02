@@ -10,6 +10,8 @@ from .cplex import *
 from .separate import TreeEnsembleSeparator
 from ..structs.ensemble import TreeEnsemble
 
+from rfc.utils import check_on_x
+
 class TreeEnsembleCompressorStatus(Enum):
     OPTIMAL = 'optimal'
     INFEASIBLE = 'infeasible'
@@ -126,7 +128,11 @@ class TreeEnsembleCompressor:
                     else:
                         for x in res.values():
                             self.addUCons(x)
+                            print('x : ',x)
+                            print('CHECK : ',check_on_x(self.ensemble, self.sol, x, tie=False))
                         sol = self.mdl.solve()
+                        print('XXXXXXXXXXXXX')
+                        print(sol)
             else:
                 self.status = TreeEnsembleCompressorStatus.INFEASIBLE
                 break
