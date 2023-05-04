@@ -31,7 +31,7 @@ class Model(cpx.Model):
     ):
         w = E.w()
         F = E.F(x)
-        return sum(w[t] * F[t][c] * u[t] for t, _ in idenumerate(E))
+        return self.sum(w[t] * F[c][t] * u[t] for t, _ in idenumerate(E))
 
     def build(
         self,
@@ -54,15 +54,15 @@ class Model(cpx.Model):
             self.__add_sample(E, x, u, lazy)
         
         # Add the constraint that at least one tree must be used.
-        self.add_constraint_(sum(u) >= 1)
+        self.add_constraint_(self.sum(u) >= 1) # type: ignore
 
         # Minimize the sum of the weights.
-        self.minimize(sum(u))
+        self.minimize(self.sum(u))
 
         # The model has been built.
         self.__built = True
 
-        return self
+        return u
 
     def add_cut(self, E: Ensemble, x: Sample, lazy: bool = False):
         if not self.__built:
@@ -79,8 +79,8 @@ class Model(cpx.Model):
         for c in range(E.n_classes):
             if c == g: continue
             rhs = self.prob(E, x, c, u)
-            if lazy: self.add_lazy_constraint(lhs >= rhs)
-            else: self.add_constraint_(lhs >= rhs)
+            if lazy: self.add_lazy_constraint(lhs >= rhs) # type: ignore
+            else: self.add_constraint_(lhs >= rhs) # type: ignore
 
     def __get_u(self, E: Ensemble) -> dict[int, Var]:
         _u = self.find_matching_vars('u')
@@ -116,10 +116,11 @@ class CounterFactual(cpx.Model):
         mu: dict[tuple[int, int], Var]
         z: dict[int, Var]
         zeta: dict[int, Var]
+        vars: dict[int, Var | dict[int, Var]] = {}
 
         keys = []
         for t, T in idenumerate(E):
-            for v, N in idenumerate(T.nodes):
+            for v, N in idenumerate(T):
                 keys.append((t, v))
         y = self.continuous_var_dict(keys, lb=0.0, ub=1.0, name='y')
 
@@ -145,11 +146,14 @@ class CounterFactual(cpx.Model):
                     l, r = N.left.id, N.right.id
                     yl.append(y[(t, l)])
                     yr.append(y[(t, r)])
-                self.add_constraint_(sum(yl) <= lam[(t, d)])
-                self.add_constraint_(sum(yr) <= 1-lam[(t, d)])
+                self.add_constraint_(self.sum(yl) <= lam[(t, d)])
+                self.add_constraint_(self.sum(yr) <= 1-lam[(t, d)])
 
         keys = [f for f, _  in idenumerate(E.binary_features)]
         xi = self.binary_var_dict(keys, name='xi')
+
+        for f, F in idenumerate(E.binary_features):
+            vars[f] = xi[f]
 
         for f, F in idenumerate(E.binary_features):
             for t, T in idenumerate(E):
@@ -164,6 +168,9 @@ class CounterFactual(cpx.Model):
             for j in range(k+1):
                 keys.append((f, j))
         mu = self.continuous_var_dict(keys, lb=0.0, ub=1.0, name='mu')
+        for f, F in idenumerate(E.numerical_features):
+            vars[f] = {j: mu[(f, j)] for j in range(len(F.levels) + 1)}
+
 
         for f, F in idenumerate(E.numerical_features):
             k = len(F.levels)
@@ -195,11 +202,9 @@ class CounterFactual(cpx.Model):
 
         self.add_constraint_(zeta[c] == self.prob(E, c, y, u))
         self.add_constraint_(zeta[g] == self.prob(E, g, y, u))
-        self.minimize(z[c] - z[g])
+        self.minimize(zeta[c] - zeta[g])
 
-        return self
-
-
+        return vars
 
 def getU(
     mdl: cpx.Model,

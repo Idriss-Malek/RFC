@@ -78,7 +78,7 @@ class Ensemble(Iterable[Tree]):
     def klass(
         self,
         x: Sample,
-        u: None | list[float] = None,
+        u: None | list[float] | dict[int, float] = None,
         tiebreaker: None | Callable[[Iterable[int]], int] = None
     ) -> int:
         p = self.p(x, u)
