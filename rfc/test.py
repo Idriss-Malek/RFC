@@ -1,6 +1,7 @@
 import pandas as pd
 from rfc.utils import load_tree_ensemble, check_on_dataset
 from rfc.module import TreeEnsembleCompressor, TreeEnsembleCompressorStatus
+from docplex.mp.context import Context
 
 # Example     
 if __name__ == '__main__':
@@ -13,9 +14,11 @@ if __name__ == '__main__':
     ensemble = str(ensemble)
     ensemble = load_tree_ensemble(ensemble, log_output=False)
     cmp = TreeEnsembleCompressor(ensemble, dataset, lazy=True)
-    cmp.compress(on='train', log_output=True, precision=8, m_iterations=10)
+    cmp.compress(on='train', log_output=False, precision=8, m_iterations=10)
     res=cmp.sep.separate(cmp.sol)
     x=res[(0,1)]
+    y=res[(1,0)]
     print('NEW CLASS : ',ensemble.klass(x,list(cmp.sol)))
     print('OLD CLASS : ', ensemble.klass(x))   
-    
+    print('NEW CLASS : ',ensemble.klass(y,list(cmp.sol)))
+    print('OLD CLASS : ', ensemble.klass(y))
