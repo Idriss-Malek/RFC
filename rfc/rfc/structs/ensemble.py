@@ -55,7 +55,7 @@ class Ensemble(Iterable[Tree]):
         updateLevels(self.numerical_features, self.__trees)
 
     def w(self, u: None | list[float] | dict[int, float] = None):
-        w = self.weights
+        w = self.weights.copy()
         if u is not None:
             for t, _ in idenumerate(self):
                 try:

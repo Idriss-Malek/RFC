@@ -7,4 +7,4 @@ U = TypeVar('U', bound=IdentifiedObject)
 
 def idenumerate(it: Iterable[U]):
     for x in it:
-        yield (x.id, x)
+        yield x.id, x

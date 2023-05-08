@@ -148,7 +148,7 @@ class Node(IdentifiedObject, BaseNode, NodeMixin):
         self.__klass = klass
 
     @property
-    def left(self):
+    def left(self) -> "Node":
         if self.is_leaf:
             msg = "Cannot get the left child of a leaf node!"
             raise TreeError(msg)
@@ -174,7 +174,7 @@ class Node(IdentifiedObject, BaseNode, NodeMixin):
         self.__detach_child(left)
 
     @property
-    def right(self):
+    def right(self) -> "Node":
         if self.is_leaf:
             msg = "Cannot get the right child of a leaf node!"
             raise TreeError(msg)

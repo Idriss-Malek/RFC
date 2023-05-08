@@ -33,7 +33,11 @@ if __name__ == '__main__':
     ensemble = str(ensemble)
     ensemble = load_tree_ensemble(ensemble, log_output=False)
     print(len(dataset))
-    cmp = Model(log_output=False, float_precision=8)
+    cmp = Model(log_output=True, float_precision=8)
+    cmp.build(ensemble, dataset, lazy=True)
+    cmp.solve()
+    print('Number of trees : ', cmp.objective_value)
+    cmp = Model(log_output=True, float_precision=8)
     cmp.build(ensemble, dataset, lazy=True)
     cmp.solve()
     print('Number of trees : ', cmp.objective_value)
@@ -42,30 +46,35 @@ if __name__ == '__main__':
     all_pos=False
     iteration = 0
     while not all_pos and iteration <= 1000:
+        cmp = Model(log_output=True, float_precision=8)
+        cmp.build(ensemble, dataset, lazy=False)
+        cmp.solve()
         all_pos = True
         for c in range(ensemble.n_classes):
             for g in range(ensemble.n_classes):
                 if c != g:            
                     print(c,g)
-                    sep = CounterFactual(log_output=False, float_precision=8)
+                    sep = CounterFactual(log_output=True, float_precision=8)
                     vars = sep.build(ensemble, u, c, g)
                     sep.solve()
                     sep.report()
                     if sep.solve_details.status_code == 101: #type:ignore
+                        x = getX(ensemble, vars)
+                        print('Classes : ', ensemble.klass(x), ensemble.klass(x, u))
                         if sep.objective_value < 0:
                             all_pos=False
-                            x = getX(ensemble, vars)
-                            print('Classes : ', ensemble.klass(x), ensemble.klass(x, u))
                             dataset = dataset.append_(x, ignore_index=True)#type:ignore
                     else :
                         print('Not found optimal solution')
         print(len(dataset))
-        cmp = Model(log_output=False, float_precision=8)
-        cmp.build(ensemble, dataset, lazy=True)
+        cmp = Model(log_output=True, float_precision=8)
+        cmp.build(ensemble, dataset, lazy=False)
         cmp.solve()
+        cmp.report()
         print('Number of trees : ', cmp.objective_value) #when run, the code will give two different valeus of nmr of trees even if the dataset doesnt change.  
         v = cmp.find_matching_vars('u')
         u = {t: v[t].solution_value for t, _ in idenumerate(ensemble)}
         iteration += 1
         print(all_pos)
         print(iteration)
+        print(u)
