@@ -32,6 +32,7 @@ if __name__ == '__main__':
     dataset = pd.read_csv(dataset)
     ensemble = str(ensemble)
     ensemble = load_tree_ensemble(ensemble, log_output=False)
+    print(len(dataset))
     cmp = Model(log_output=False, float_precision=8)
     cmp.build(ensemble, dataset, lazy=True)
     cmp.solve()
@@ -50,17 +51,21 @@ if __name__ == '__main__':
                     vars = sep.build(ensemble, u, c, g)
                     sep.solve()
                     sep.report()
-                    print(sep.solve_details.status())
-                    print('Solution : ',sep.objective_value)
-                    if sep.objective_value < 0:
-                        all_pos=False
-                        x = getX(ensemble, vars)
-                        print('Classes : ', ensemble.klass(x), ensemble.klass(x, u))
-                        dataset = dataset.append(x, ignore_index=True)#type:ignore
+                    if sep.solve_details.status_code == 101: #type:ignore
+                        if sep.objective_value < 0:
+                            all_pos=False
+                            x = getX(ensemble, vars)
+                            print('Classes : ', ensemble.klass(x), ensemble.klass(x, u))
+                            dataset = dataset.append_(x, ignore_index=True)#type:ignore
+                    else :
+                        print('Not found optimal solution')
+        print(len(dataset))
         cmp = Model(log_output=False, float_precision=8)
         cmp.build(ensemble, dataset, lazy=True)
         cmp.solve()
-        print('Number of trees : ', cmp.objective_value)
+        print('Number of trees : ', cmp.objective_value) #when run, the code will give two different valeus of nmr of trees even if the dataset doesnt change.  
         v = cmp.find_matching_vars('u')
         u = {t: v[t].solution_value for t, _ in idenumerate(ensemble)}
         iteration += 1
+        print(all_pos)
+        print(iteration)
