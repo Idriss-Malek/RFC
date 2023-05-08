@@ -1,7 +1,6 @@
 import pandas as pd
 from rfc.utils import load_tree_ensemble, check_on_dataset
 from rfc.module import TreeEnsembleCompressor, TreeEnsembleCompressorStatus
-from docplex.mp.context import Context
 
 from rfc.module import Model, CounterFactual
 from rfc.structs import Ensemble
@@ -36,11 +35,32 @@ if __name__ == '__main__':
     cmp = Model(log_output=False, float_precision=8)
     cmp.build(ensemble, dataset, lazy=True)
     cmp.solve()
+    print('Number of trees : ', cmp.objective_value)
     v = cmp.find_matching_vars('u')
     u = {t: v[t].solution_value for t, _ in idenumerate(ensemble)}
-    sep = CounterFactual(log_output=True, float_precision=8)
-    vars = sep.build(ensemble, u, 0, 1)
-    sep.solve()
-    sep.report()
-    x = getX(ensemble, vars)
-    print(ensemble.klass(x), ensemble.klass(x, u))
+    all_pos=False
+    iteration = 0
+    while not all_pos and iteration <= 1000:
+        all_pos = True
+        for c in range(ensemble.n_classes):
+            for g in range(ensemble.n_classes):
+                if c != g:            
+                    print(c,g)
+                    sep = CounterFactual(log_output=False, float_precision=8)
+                    vars = sep.build(ensemble, u, c, g)
+                    sep.solve()
+                    sep.report()
+                    print(sep.solve_details.status())
+                    print('Solution : ',sep.objective_value)
+                    if sep.objective_value < 0:
+                        all_pos=False
+                        x = getX(ensemble, vars)
+                        print('Classes : ', ensemble.klass(x), ensemble.klass(x, u))
+                        dataset = dataset.append(x, ignore_index=True)#type:ignore
+        cmp = Model(log_output=False, float_precision=8)
+        cmp.build(ensemble, dataset, lazy=True)
+        cmp.solve()
+        print('Number of trees : ', cmp.objective_value)
+        v = cmp.find_matching_vars('u')
+        u = {t: v[t].solution_value for t, _ in idenumerate(ensemble)}
+        iteration += 1
