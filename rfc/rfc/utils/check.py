@@ -52,7 +52,7 @@ def accuracy(
         u: None | np.ndarray = None
 ) -> float:
     if u is None:
-        u = np.ones(len(ensemble.__trees))
+        u = np.ones(len(ensemble))
     w = ensemble.weights
     wu = u * w
     acc=[]

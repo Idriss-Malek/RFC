@@ -27,17 +27,12 @@ if __name__ == '__main__':
     import pathlib
     root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
     dataset = root / 'datasets/Pima-Diabetes/Pima-Diabetes.full.csv'
-    ensemble = root / 'forests/Pima-Diabetes/Pima-Diabetes.RF1.txt'
+    ensemble = root / 'forests/Pima-Diabetes/Pima-Diabetes.LITTLE.RF1.txt'
     dataset = str(dataset)
-    dataset = pd.read_csv(dataset)
+    dataset = pd.read_csv(dataset)[:20]
     ensemble = str(ensemble)
     ensemble = load_tree_ensemble(ensemble, log_output=False)
-    print(len(dataset))
-    cmp = Model(log_output=True, float_precision=8)
-    cmp.build(ensemble, dataset, lazy=True)
-    cmp.solve()
-    print('Number of trees : ', cmp.objective_value)
-    cmp = Model(log_output=True, float_precision=8)
+    cmp = Model(log_output=False, float_precision=8)
     cmp.build(ensemble, dataset, lazy=True)
     cmp.solve()
     print('Number of trees : ', cmp.objective_value)
@@ -46,10 +41,7 @@ if __name__ == '__main__':
     all_pos=False
     iteration = 0
     while not all_pos and iteration <= 1000:
-        cmp = Model(log_output=True, float_precision=8)
-        cmp.build(ensemble, dataset, lazy=False)
-        cmp.solve()
-        all_pos = True
+        all_pos=True
         for c in range(ensemble.n_classes):
             for g in range(ensemble.n_classes):
                 if c != g:            
@@ -58,6 +50,7 @@ if __name__ == '__main__':
                     vars = sep.build(ensemble, u, c, g)
                     sep.solve()
                     sep.report()
+                    sep.print_information()
                     if sep.solve_details.status_code == 101: #type:ignore
                         x = getX(ensemble, vars)
                         print('Classes : ', ensemble.klass(x), ensemble.klass(x, u))
@@ -65,16 +58,13 @@ if __name__ == '__main__':
                             all_pos=False
                             dataset = dataset.append_(x, ignore_index=True)#type:ignore
                     else :
+                        print(sep.export_as_lp(basename='sep_fail',path='..'))
                         print('Not found optimal solution')
-        print(len(dataset))
-        cmp = Model(log_output=True, float_precision=8)
-        cmp.build(ensemble, dataset, lazy=False)
+        cmp = Model(log_output=False, float_precision=8)
+        cmp.build(ensemble, dataset, lazy=True)
         cmp.solve()
         cmp.report()
         print('Number of trees : ', cmp.objective_value) #when run, the code will give two different valeus of nmr of trees even if the dataset doesnt change.  
         v = cmp.find_matching_vars('u')
         u = {t: v[t].solution_value for t, _ in idenumerate(ensemble)}
         iteration += 1
-        print(all_pos)
-        print(iteration)
-        print(u)
