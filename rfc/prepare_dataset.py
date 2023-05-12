@@ -104,15 +104,13 @@ def prepareData(benchmarkIdentifier):
             try:
                 if not linecount <= 1:
                     featureData.append([float(x) for x in row[:-1]])
-                    targetData.append(int(row[-1]))
+                    targetData.append(int(float(row[-1])))
 
                 if linecount == 0:
                     header = row
                 if linecount == 1:
                     continuousFeatureList = row
                     numFeatures = len(continuousFeatureList)-1#type:ignore 
-
-
             except:
                 print('Invalid line', linecount, ':', row)
             linecount = linecount + 1
@@ -158,6 +156,7 @@ def binning(featureData, continuousFeatureList, numOfBins):
 def process_dataset(dataset, numOfTrees, treeDepth, numOfRuns):
     targetData, featureData, continuousFeatureList, header, featureList = prepareData(str(dataset_dir/ dataset / dataset)+'.csv')
     #
+
     if not (rf_dir / dataset ).exists():
         (rf_dir / dataset ).mkdir(parents=True)
 
