@@ -27,38 +27,51 @@ class Compressor:
         self.ensemble = ensemble
         self.dataset = dataset
         self.lazy = lazy
+        self.u = [1.0 for i in range (len(ensemble))]
         self.mdl = gp.Model(name = 'Compressor') # type: ignore
     
     def build(self):
-        u = self.mdl.addVars(len(self.ensemble), vtype=gp.GRB.BINARY) #type: ignore
+        u = self.mdl.addVars(len(self.ensemble), vtype=gp.GRB.BINARY, name="u") #type: ignore
         for index,row in self.dataset.iterrows():
+            klass=self.ensemble.klass(row) #type: ignore
             left_expr=gp.LinExpr() # type: ignore
             for t,_ in idenumerate(self.ensemble):
                 left_expr.add(u[t],self.ensemble.weights[t]*self.ensemble[t].F(row,klass))#type: ignore
-            klass=self.ensemble.klass(row) #type: ignore
             for c in range(self.ensemble.n_classes):
                 if c!=klass:
                     right_expr=gp.LinExpr() # type: ignore
                     for t,_ in idenumerate(self.ensemble):
                         right_expr.add(u[t],self.ensemble.weights[t]*self.ensemble[t].F(row,c))#type: ignore
-                self.mdl.addConstrs(left_expr >= right_expr, f"c_{index}_{c}")#type: ignore
-        self.mdl.setObjective(sum(u),sense=gp.GRB.MINIMIZE)#type: ignore
+                self.mdl.addConstr(left_expr >= right_expr, f"c_{index}_{c}")#type: ignore
+        self.mdl.addConstr(u.sum() >= 1, "sum_constraint")
+        self.mdl.setObjective(u.sum(),sense=gp.GRB.MINIMIZE)#type: ignore
     
     def add(self, row : dict):
+        klass=self.ensemble.klass(row) #type: ignore
         self.dataset = self.dataset.append(row, ignore_index=True)#type: ignore
         left_expr=gp.LinExpr() # type: ignore
         for t,_ in idenumerate(self.ensemble):
             left_expr.add(u[t],self.ensemble.weights[t]*self.ensemble[t].F(row,klass))#type: ignore
-        klass=self.ensemble.klass(row) #type: ignore
         for c in range(self.ensemble.n_classes):
             if c!=klass:
                 right_expr=gp.LinExpr() # type: ignore
                 for t,_ in idenumerate(self.ensemble):
                     right_expr.add(u[t],self.ensemble.weights[t]*self.ensemble[t].F(row,c))#type: ignore
-            self.mdl.addConstrs(left_expr >= right_expr, f"c_{index}_{c}")#type: ignore
+            self.mdl.addConstr(left_expr >= right_expr, f"c_{index}_{c}")#type: ignore
     
     def solve(self):
         self.mdl.optimize()
+        for x in self.mdl.getVars():
+            if x.X >=0.5:
+                print(x.VarName)
+    
+    def check(self):
+        total=len(self.dataset)
+        sucess=0
+        for index,row in self.dataset.iterrows():
+            sucess+=(self.ensemble.klass(row) == self.ensemble.klass(row,[x.X for x in self.mdl.getVars()])) #type: ignore
+        print('SUCESS RATE : ',sucess/total)#type: ignore
+                
 
 if __name__ == '__main__':
     print('test')
