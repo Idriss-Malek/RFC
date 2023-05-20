@@ -27,7 +27,6 @@ class Compressor:
         self.ensemble = ensemble
         self.dataset = dataset
         self.lazy = lazy
-        self.u = [1.0 for i in range (len(ensemble))]
         self.mdl = gp.Model(name = 'Compressor') # type: ignore
     
     def build(self):
@@ -45,7 +44,6 @@ class Compressor:
                 self.mdl.addConstr(left_expr >= right_expr, f"c_{index}_{c}")#type: ignore
         self.mdl.addConstr(u.sum() >= 1, "sum_constraint")
         self.mdl.setObjective(u.sum(),sense=gp.GRB.MINIMIZE)#type: ignore
-    
     def add(self, row : dict):
         klass=self.ensemble.klass(row) #type: ignore
         self.dataset = self.dataset.append(row, ignore_index=True)#type: ignore
@@ -60,10 +58,14 @@ class Compressor:
             self.mdl.addConstr(left_expr >= right_expr, f"c_{index}_{c}")#type: ignore
     
     def solve(self):
+        print('XXXXXX')
+        print(self.mdl.getObjective())
+        print([x for x in self.mdl.getVars()])
+        print('XXXXXXXX')
+
         self.mdl.optimize()
-        for x in self.mdl.getVars():
-            if x.X >=0.5:
-                print(x.VarName)
+        
+        return [x.X for x in self.mdl.getVars()]
     
     def check(self):
         total=len(self.dataset)

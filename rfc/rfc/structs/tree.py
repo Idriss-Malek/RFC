@@ -114,6 +114,19 @@ class Tree(IdentifiedObject, Iterable[Node]):
             tuple[Node, ...]: All internal nodes that split on the specified feature.
         """
         return tuple(self.__nodes(lambda node: node.split_on(f)))
+    
+    def nodes_with_feature_and_level(self, f: int | Feature, level: float) -> tuple[Node, ...]:
+        """
+        Returns all internal nodes that split on the specified numerical feature with the specified level.
+
+        Args:
+            f (int | Feature): The feature to be checked or its id.
+            level (float): The level to be checked.
+
+        Returns:
+            tuple[Node, ...]: All internal nodes that split on the specified numerical feature with the specified level.
+        """
+        return tuple(self.__nodes(lambda node: (node.split_on(f) and node.threshold == level)))
 
     @property
     def nodes(self) -> tuple[Node, ...]:
