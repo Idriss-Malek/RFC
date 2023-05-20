@@ -12,14 +12,17 @@ if __name__ == '__main__':
     dataset = pd.read_csv(dataset)[:20]
     ensemble = str(ensemble)
     ensemble = load_tree_ensemble(ensemble, log_output=False)
-    print(ensemble.features[0].levels)
     '''
     compressor = Compressor(ensemble, dataset, True)
     compressor.build()
     compressor.solve()
     compressor.check()
     print(compressor.mdl.getObjective())
-    separator=Separator(ensemble, [1.0]+[0.0 for i in range(len(ensemble)-1)])
-    separator.build_y()
     '''
+    separator=Separator(ensemble, [1.0]+[0.0 for i in range(len(ensemble)-1)])
+    separator.build_base()
+    rows=separator.find_all()
+    print('SEPARATOR IS : ',rows)
+
+    
 
