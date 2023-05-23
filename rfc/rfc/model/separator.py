@@ -23,19 +23,21 @@ class Separator:
         self.lazy = lazy
         self.u = u
         self.sep = []
-        self.mdl=gp.Model(name = 'Base_Separator') #type: ignore
+        self.mdl = None #type: ignore
         self.y = None
         self.lbd = None
         self.ksi = None
         self.mu = None
         self.z = None
         self.zeta = None
-
+    
+    def update_u(self,u):
+        self.u = u
 
     def build_y(self):
         self.y = self.mdl.addVars([(t,node.id) for t,tree in idenumerate(self.ensemble) for node in tree],ub=[1.0 for t,tree in idenumerate(self.ensemble) for node in tree],vtype=gp.GRB.CONTINUOUS, name="y") #type: ignore
-        self.mdl.addConstrs((self.y[t,tree.root.id] == 1. for t,tree in idenumerate(self.ensemble)))
-        self.mdl.addConstrs((self.y[t,node.id] == self.y[t,node.left.id] + self.y[t,node.right.id] for t,tree in idenumerate(self.ensemble) for node in tree.nodes))
+        self.mdl.addConstrs((self.y[t,tree.root.id] == 1. for t,tree in idenumerate(self.ensemble)))#type: ignore
+        self.mdl.addConstrs((self.y[t,node.id] == self.y[t,node.left.id] + self.y[t,node.right.id] for t,tree in idenumerate(self.ensemble) for node in tree.nodes))#type: ignore
     
     def build_lbd(self):
         self.lbd = self.mdl.addVars([(t,d) for t,tree in idenumerate(self.ensemble) for d in range(tree.depth+1)], vtype=gp.GRB.BINARY, name="lbd") #type: ignore
@@ -45,14 +47,14 @@ class Separator:
     def build_ksi(self):
         binary_features_id = [feature.id for feature in self.ensemble.features if feature.isbinary()]
         self.ksi = self.mdl.addVars(binary_features_id,vtype=gp.GRB.BINARY,name='ksi')#type: ignore
-        self.mdl.addConstrs((self.ksi[i] <= 1 - self.y[t,node.left.id] for i in binary_features_id for t,tree in idenumerate(self.ensemble) for node in tree.nodes_with_feature(i)), 'binary_left_condtion')#type: ignore
-        self.mdl.addConstrs((self.ksi[i] >= self.y[t,node.right.id] for i in binary_features_id for t,tree in idenumerate(self.ensemble) for node in tree.nodes_with_feature(i)), 'binary_right_condtion')#type: ignore
+        self.mdl.addConstrs((self.ksi[i] <= 1 - self.y[t,node.left.id] for i in binary_features_id for t,tree in idenumerate(self.ensemble) for node in tree.nodes_with_feature(i)))#type: ignore
+        self.mdl.addConstrs((self.ksi[i] >= self.y[t,node.right.id] for i in binary_features_id for t,tree in idenumerate(self.ensemble) for node in tree.nodes_with_feature(i)))#type: ignore
 
     def build_mu(self):
         epsilon = 10e-3
         numerical_features = [feature for feature in self.ensemble.features if feature.isnumerical()]
         self.mu = self.mdl.addVars([(feature.id,j) for feature in numerical_features for j in range(len(feature.levels)+1)],ub=[1.0 for feature in numerical_features for j in range(len(feature.levels)+1)],vtype=gp.GRB.CONTINUOUS, name="mu")#type:ignore
-        self.mdl.addConstrs((self.mu[feature.id,j-1] >= self.mu[feature.id,j] for feature in numerical_features for j in range(1,len(feature.levels)+1)))
+        self.mdl.addConstrs((self.mu[feature.id,j-1] >= self.mu[feature.id,j] for feature in numerical_features for j in range(1,len(feature.levels)+1)))#type: ignore
         self.mdl.addConstrs((self.mu[feature.id,j] <= 1 - self.y[t,node.left.id] for feature in numerical_features for t,tree in idenumerate(self.ensemble) for j in range(1,len(feature.levels)+1) for node in tree.nodes_with_feature_and_level(feature,([feature.levels[0]-1]+feature.levels)[j])))#type: ignore
         self.mdl.addConstrs((self.mu[feature.id,j-1] >= self.y[t,node.right.id] for feature in numerical_features for t,tree in idenumerate(self.ensemble) for j in range(1,len(feature.levels)+1) for node in tree.nodes_with_feature_and_level(feature,([feature.levels[0]-1]+feature.levels)[j])))#type: ignore
         self.mdl.addConstrs((self.mu[feature.id,j] >= epsilon * self.y[t,node.right.id] for feature in numerical_features for t,tree in idenumerate(self.ensemble) for j in range(1,len(feature.levels)+1) for node in tree.nodes_with_feature_and_level(feature,([feature.levels[0]-1]+feature.levels)[j])))#type: ignore
@@ -76,6 +78,8 @@ class Separator:
         self.mdl.addConstrs((self.z[c] >= self.z[g] for g in range(self.ensemble.n_classes) if c != g),'class_constraint')#type:ignore
 
     def build_mdl(self,c,g): 
+        self.mdl = gp.Model(name = f'Separator_{c}_{g}')#type: ignore
+        self.build_base()
         self.build_zeta(c,g)
         self.build_class_constraint(c)
         self.mdl.setObjective(self.zeta[c] - self.zeta[g], sense=gp.GRB.MINIMIZE) #type: ignore
@@ -106,10 +110,6 @@ class Separator:
                 if c != g:
                     row=self.solve(c,g)
                     if row :
-                        print(c,g)
-                        print(row)
-                        print(self.ensemble.klass(row))
-                        print(self.ensemble.klass(row,self.u))
                         if self.ensemble.klass(row) != self.ensemble.klass(row,self.u):
                             rows.append(row)
         return rows

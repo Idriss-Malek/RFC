@@ -44,27 +44,22 @@ class Compressor:
                 self.mdl.addConstr(left_expr >= right_expr, f"c_{index}_{c}")#type: ignore
         self.mdl.addConstr(u.sum() >= 1, "sum_constraint")
         self.mdl.setObjective(u.sum(),sense=gp.GRB.MINIMIZE)#type: ignore
-    def add(self, row : dict):
-        klass=self.ensemble.klass(row) #type: ignore
-        self.dataset = self.dataset.append(row, ignore_index=True)#type: ignore
+    def add(self, rows : list[dict]):
+        klass=self.ensemble.klass(rows) #type: ignore
+        self.dataset = self.dataset.append(rows, ignore_index=True)#type: ignore
         left_expr=gp.LinExpr() # type: ignore
-        for t,_ in idenumerate(self.ensemble):
-            left_expr.add(u[t],self.ensemble.weights[t]*self.ensemble[t].F(row,klass))#type: ignore
-        for c in range(self.ensemble.n_classes):
-            if c!=klass:
-                right_expr=gp.LinExpr() # type: ignore
-                for t,_ in idenumerate(self.ensemble):
-                    right_expr.add(u[t],self.ensemble.weights[t]*self.ensemble[t].F(row,c))#type: ignore
-            self.mdl.addConstr(left_expr >= right_expr, f"c_{index}_{c}")#type: ignore
-    
-    def solve(self):
-        print('XXXXXX')
-        print(self.mdl.getObjective())
-        print([x for x in self.mdl.getVars()])
-        print('XXXXXXXX')
-
-        self.mdl.optimize()
+        for row in rows:
+            for t,_ in idenumerate(self.ensemble):
+                left_expr.add(u[t],self.ensemble.weights[t]*self.ensemble[t].F(row,klass))#type: ignore
+            for c in range(self.ensemble.n_classes):
+                if c!=klass:
+                    right_expr=gp.LinExpr() # type: ignore
+                    for t,_ in idenumerate(self.ensemble):
+                        right_expr.add(u[t],self.ensemble.weights[t]*self.ensemble[t].F(row,c))#type: ignore
+                self.mdl.addConstr(left_expr >= right_expr, f"c_{index}_{c}")#type: ignore
         
+    def solve(self):
+        self.mdl.optimize()
         return [x.X for x in self.mdl.getVars()]
     
     def check(self):
@@ -72,7 +67,7 @@ class Compressor:
         sucess=0
         for index,row in self.dataset.iterrows():
             sucess+=(self.ensemble.klass(row) == self.ensemble.klass(row,[x.X for x in self.mdl.getVars()])) #type: ignore
-        print('SUCESS RATE : ',sucess/total)#type: ignore
+        return sucess/total 
                 
 
 if __name__ == '__main__':
