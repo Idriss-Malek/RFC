@@ -91,7 +91,7 @@ class Separator:
                 row[feature.id] = self.ksi[feature.id].X#type: ignore
             if feature.isnumerical():
                 levels=feature.levels
-                extended_levels = [levels[0] - 1] + levels + [levels[-1] + 1]
+                extended_levels = [0] + levels + [levels[-1] + 1]
                 row[feature.id] = sum([(extended_levels[j+1]-extended_levels[j]) * self.mu[feature.id,j].X for j in range(len(levels)+1)])#type: ignore
         return row
 
@@ -110,6 +110,9 @@ class Separator:
                 if c != g:
                     row=self.solve(c,g)
                     if row :
+                        print(c,g)
+                        print(self.ensemble.klass(row))
+                        print(self.ensemble.klass(row,self.u))
                         if self.ensemble.klass(row) != self.ensemble.klass(row,self.u):
                             rows.append(row)
         return rows
