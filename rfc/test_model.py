@@ -12,9 +12,8 @@ if __name__ == '__main__':
     dataset = pd.read_csv(dataset)[:20]
     ensemble = str(ensemble)
     ensemble = load_tree_ensemble(ensemble, log_output=False)
-    separator=Separator(ensemble, [1.0]+[0.0 for i in range(len(ensemble)-1)])
-    rows=separator.find_all()
-    print('SEPARATOR IS : ',rows)
+    rfc = RFC(ensemble,dataset)
+    rfc.solve(iterations=1000)
 
     
 

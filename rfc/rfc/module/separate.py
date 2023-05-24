@@ -80,11 +80,10 @@ class TreeEnsembleSeparator:
                 case FeatureType.NUMERICAL:
                     levels = feature.levels
                     k = len(levels) + 1
-                    vs = [0.5 * (1 + np.tanh(v)) for v in levels]
-                    vs = [0.0] + vs + [1.0]
+                    vs = [0.0] + levels + [levels[-1]+1]
                     vs = np.array(vs)
                     mu = np.array([self.mu[(f, j)].solution_value for j in range(k)])
-                    self.x[f] = np.arctanh(2 * (np.diff(vs) @ mu) - 1) # TODO: check this later.
+                    self.x[f] = np.diff(vs) @ mu # TODO: check this later.
                     pass
                 case FeatureType.CATEGORICAL:
                     pass
