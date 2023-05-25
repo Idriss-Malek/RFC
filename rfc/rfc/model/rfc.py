@@ -13,6 +13,7 @@ class RFC:
         self,
         ensemble: Ensemble,
         dataset: pd.DataFrame,
+        test_dataset : pd.DataFrame | None = None
     ) -> None:
         if not isinstance(ensemble, Ensemble):
             raise TypeError('ensemble must be a TreeEnsemble')
@@ -25,6 +26,10 @@ class RFC:
         self.compressor = Compressor(ensemble,dataset)
         self.u = [1.0 for i in range(len(self.ensemble))]
         self.separator = Separator(ensemble,self.u)
+        self.test_dataset = test_dataset
+
+    def check(self, dataset = None):
+        self.compressor.check(dataset)
 
     def solve(self,iterations = 1000):
         def write_in_file(file, line):
@@ -46,6 +51,9 @@ class RFC:
             if not sep:
                 write_in_file(f'rfc_test_{initial}.csv','Lossless compression completed. \n')
                 print('Lossless compression completed.')
+                write_in_file(f'rfc_test_{initial}.csv',f'{self.u} \n')
+                if not self.test_dataset is None:
+                    write_in_file(f'rfc_test_{initial}.csv',f'Lossless compression on test_dataset : {self.check(self.test_dataset)}')
                 return self.u
             else:
                 self.compressor.add(sep)
@@ -56,3 +64,4 @@ class RFC:
         write_in_file(f'rfc_test_{initial}.csv',f'{self.u} \n')
         print('Number of iterations achieved.')
         return self.u
+    

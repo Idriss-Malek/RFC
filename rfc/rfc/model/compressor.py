@@ -59,8 +59,9 @@ class Compressor:
         self.u = [x.X for x in self.mdl.getVars()]
         return self.u
     
-    def check(self):
-        for index,row in self.dataset.iterrows():
+    def check(self,dataset = None):
+        if None : dataset = self.dataset
+        for index,row in dataset.iterrows():#type: ignore
             if (self.ensemble.klass(row) != self.ensemble.klass(row,self.u)): #type: ignore
                 return False
         return True
