@@ -28,6 +28,7 @@ class RFC:
         self.separator = Separator(ensemble,self.u)
         self.test_dataset = test_dataset
 
+
     def check(self, dataset = None):
         self.compressor.check(dataset)
 
@@ -40,28 +41,17 @@ class RFC:
         for i in range(iterations):
             self.u=self.compressor.solve()
             so_far = time.time()
-            write_in_file(f'rfc_test_{initial}.csv',f"{i},{sum(self.u)},{so_far-initial},{self.compressor.check()} \n")
-            '''check = self.compressor.check()
-            if check <1.0:
-                write_in_file(f'rfc_test_{initial}.csv',f'Lossless compression failed: {check} \n')
-                print('Lossless compression failed.')
-                return'''
             self.separator.update_u(self.u)
             sep=self.separator.find_all()
             if not sep:
-                write_in_file(f'rfc_test_{initial}.csv','Lossless compression completed. \n')
-                print('Lossless compression completed.')
-                write_in_file(f'rfc_test_{initial}.csv',f'{self.u} \n')
-                if not self.test_dataset is None:
-                    write_in_file(f'rfc_test_{initial}.csv',f'Lossless compression on test_dataset : {self.check(self.test_dataset)}')
+                write_in_file(f'rfc_test3.csv',f"{len(self.dataset)},{i},{sum(self.u)},{so_far-initial},{self.compressor.check()},{self.compressor.check(self.test_dataset)} \n")
+                #if not self.test_dataset is None:
+                    #write_in_file(f'rfc_test_{initial}.csv',f'Lossless compression on test_dataset : {self.check(self.test_dataset)}')
                 return self.u
             else:
                 self.compressor.add(sep)
         self.u = self.compressor.solve()
         so_far = time.time()
-        write_in_file(f'rfc_test_{initial}.csv',f"final,{sum(self.u)},{so_far-initial},{self.compressor.check()} \n")
-        write_in_file(f'rfc_test_{initial}.csv',f'Number of iterations achieved with {sum(self.u)} trees. \n')
-        write_in_file(f'rfc_test_{initial}.csv',f'{self.u} \n')
-        print('Number of iterations achieved.')
+        write_in_file(f'rfc_test3.csv',f"{len(self.dataset)},{iterations},{sum(self.u)},{so_far-initial},{self.compressor.check()},{self.compressor.check(self.test_dataset)} \n")
         return self.u
     

@@ -1,0 +1,11 @@
+,Ensemble,Base Dataset,Original Size,Compressed Size,Compression Time,Reached Optimal ,Number of iterations,Reached Optimal
+0,HTRU2.RF5.txt,HTRU2.train5.csv,100,2,43.62162997300038,,1,False
+1,HTRU2.RF2.txt,HTRU2.train2.csv,100,2,45.652822497999296,,1,False
+2,HTRU2.RF3.txt,HTRU2.train3.csv,100,2,45.49008643999696,,1,False
+3,HTRU2.RF4.txt,HTRU2.train4.csv,100,2,320.6362487150036,,1,False
+4,HTRU2.RF9.txt,HTRU2.train9.csv,100,2,45.49823099200148,,1,False
+5,HTRU2.RF7.txt,HTRU2.train7.csv,100,2,694.2815352110047,,1,False
+6,HTRU2.RF10.txt,HTRU2.train10.csv,100,2,45.761543109998456,,1,False
+7,HTRU2.RF1.txt,HTRU2.train1.csv,100,1,42.73755986300239,,1,False
+8,HTRU2.RF6.txt,HTRU2.train6.csv,100,2,45.59090868900239,,1,False
+9,HTRU2.RF8.txt,HTRU2.train8.csv,100,2,45.65565664300084,,1,False

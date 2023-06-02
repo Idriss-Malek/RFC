@@ -1,0 +1,11 @@
+,Ensemble,Base Dataset,Original Size,Compressed Size,Compression Time,Reached Optimal ,Number of iterations,Reached Optimal
+0,Pima-Diabetes.RF1.txt,Pima-Diabetes.train1.csv,100,6,9954.100638123999,,1000,False
+1,Pima-Diabetes.RF6.txt,Pima-Diabetes.train6.csv,100,4,3740.570508316001,,1000,False
+2,Pima-Diabetes.RF10.txt,Pima-Diabetes.train10.csv,100,4,6570.863788389999,,1000,False
+3,Pima-Diabetes.RF8.txt,Pima-Diabetes.train8.csv,100,2,3686.6424923660015,,1000,False
+4,Pima-Diabetes.RF9.txt,Pima-Diabetes.train9.csv,100,2,3353.1693027750007,,1000,False
+5,Pima-Diabetes.RF7.txt,Pima-Diabetes.train7.csv,100,6,12198.711220174999,,1000,False
+6,Pima-Diabetes.RF3.txt,Pima-Diabetes.train3.csv,100,2,4067.699414897994,,1000,False
+7,Pima-Diabetes.RF4.txt,Pima-Diabetes.train4.csv,100,6,8655.384725840995,,1000,False
+8,Pima-Diabetes.RF5.txt,Pima-Diabetes.train5.csv,100,4,5068.647166519004,,1000,False
+9,Pima-Diabetes.RF2.txt,Pima-Diabetes.train2.csv,100,4,4159.5329343289995,,1000,False

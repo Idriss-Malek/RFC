@@ -1,0 +1,11 @@
+,Ensemble,Base Dataset,Original Size,Compressed Size,Compression Time,Reached Optimal ,Number of iterations,Reached Optimal
+0,Breast-Cancer-Wisconsin.RF1.txt,Breast-Cancer-Wisconsin.train1.csv,100,2,9.748501417998341,,1,False
+1,Breast-Cancer-Wisconsin.RF6.txt,Breast-Cancer-Wisconsin.train6.csv,100,2,7.5800367439951515,,1,False
+2,Breast-Cancer-Wisconsin.RF8.txt,Breast-Cancer-Wisconsin.train8.csv,100,2,11.693504588998621,,1,False
+3,Breast-Cancer-Wisconsin.RF9.txt,Breast-Cancer-Wisconsin.train9.csv,100,2,8.522147591997054,,1,False
+4,Breast-Cancer-Wisconsin.RF7.txt,Breast-Cancer-Wisconsin.train7.csv,100,2,7.116565879005066,,1,False
+5,Breast-Cancer-Wisconsin.RF10.txt,Breast-Cancer-Wisconsin.train10.csv,100,2,8.151466679002624,,1,False
+6,Breast-Cancer-Wisconsin.RF3.txt,Breast-Cancer-Wisconsin.train3.csv,100,2,11.649395558000833,,1,False
+7,Breast-Cancer-Wisconsin.RF4.txt,Breast-Cancer-Wisconsin.train4.csv,100,2,9.34729209500074,,1,False
+8,Breast-Cancer-Wisconsin.RF5.txt,Breast-Cancer-Wisconsin.train5.csv,100,2,10.736323696000909,,1,False
+9,Breast-Cancer-Wisconsin.RF2.txt,Breast-Cancer-Wisconsin.train2.csv,100,2,8.797734414998558,,1,False

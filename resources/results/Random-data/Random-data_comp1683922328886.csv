@@ -1,0 +1,11 @@
+,Ensemble,Train Dataset,Test Dataset,Original Size,Compressed Size,Compression Time,Accuracy on Train Dataset,Compression is Lossless for Train dataset,Percentage of ties in train set,Lossless compression rate for test dataset,Original accuracy on Test Dataset,New accuracy on Test Dataset,Percentage of ties in test set,Percentage of ties in train_set
+0,Random-data.RF3.txt,Random-data.train3.csv,Random-data.test3.csv,100,2.0,20.437264269,0.9197777777777778,True,,1.0,0.921,0.916,0.028,0.022444444444444444
+1,Random-data.RF4.txt,Random-data.train4.csv,Random-data.test4.csv,100,2.0,20.361624862,0.9186666666666666,True,,1.0,0.922,0.922,0.014,0.011444444444444445
+2,Random-data.RF5.txt,Random-data.train5.csv,Random-data.test5.csv,100,1.0,20.310330725,0.9186666666666666,True,,1.0,0.92,0.92,0.0,0.0
+3,Random-data.RF2.txt,Random-data.train2.csv,Random-data.test2.csv,100,2.0,20.21688557799999,0.9208888888888889,True,,1.0,0.901,0.901,0.05,0.045
+4,Random-data.RF10.txt,Random-data.train10.csv,Random-data.test10.csv,100,2.0,20.109996897999963,0.9184444444444444,True,,1.0,0.926,0.896,0.091,0.08177777777777778
+5,Random-data.RF1.txt,Random-data.train1.csv,Random-data.test1.csv,100,2.0,18.89800120000001,0.9192222222222223,True,,1.0,0.922,0.914,0.019,0.01622222222222222
+6,Random-data.RF6.txt,Random-data.train6.csv,Random-data.test6.csv,100,2.0,19.03475044800001,0.9183333333333333,True,,1.0,0.923,0.917,0.029,0.03144444444444444
+7,Random-data.RF8.txt,Random-data.train8.csv,Random-data.test8.csv,100,1.0,19.00358085800002,0.919,True,,1.0,0.915,0.915,0.0,0.0
+8,Random-data.RF9.txt,Random-data.train9.csv,Random-data.test9.csv,100,2.0,19.531853087999934,0.9186666666666666,True,,1.0,0.919,0.912,0.04,0.02988888888888889
+9,Random-data.RF7.txt,Random-data.train7.csv,Random-data.test7.csv,100,2.0,18.96789637300003,0.9198888888888889,True,,1.0,0.92,0.916,0.043,0.03988888888888889

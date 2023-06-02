@@ -1,11 +1,12 @@
 import pandas as pd
-import numpy as np
+import random as rd
 
 import gurobipy as gp
 
 from ..structs.ensemble import Ensemble
 from ..structs.utils import idenumerate
 
+epsilon = 10e-4
 
 class Compressor:
     dataset : pd.DataFrame
@@ -31,6 +32,7 @@ class Compressor:
         self.u = [1.0 for t,_ in idenumerate(ensemble)]
     
     def build(self):
+        self.mdl.setParam(gp.GRB.Param.Threads, 4)#type: ignore
         u = self.mdl.addVars(len(self.ensemble), vtype=gp.GRB.BINARY, name="u") #type: ignore
         for _,row in self.dataset.iterrows():
             klass=self.ensemble.klass(row) #type: ignore
@@ -39,7 +41,7 @@ class Compressor:
                 if c!=klass:
                     for t,_ in idenumerate(self.ensemble):
                         left_expr.add(u[t],self.ensemble.weights[t]*(self.ensemble[t].F(row,klass)-self.ensemble[t].F(row,c)))#type: ignore
-                    self.mdl.addConstr(left_expr >= 0.01)#type: ignore
+                    self.mdl.addConstr(left_expr >= epsilon)#type: ignore
         self.mdl.addConstr(u.sum() >= 1, "sum_constraint")
         self.mdl.setObjective(u.sum(),sense=gp.GRB.MINIMIZE)#type: ignore
     def add(self, rows : list[dict]):
@@ -52,7 +54,7 @@ class Compressor:
                 if c!=klass:
                     for t,_ in idenumerate(self.ensemble):
                         left_expr.add(u[t],self.ensemble.weights[t]*(self.ensemble[t].F(row,klass)-self.ensemble[t].F(row,c)))#type: ignore
-                    self.mdl.addConstr(left_expr >= 0.01)#type: ignore
+                    self.mdl.addConstr(left_expr >= epsilon)#type: ignore
         
     def solve(self):
         self.mdl.optimize()
@@ -60,8 +62,8 @@ class Compressor:
         return self.u
     
     def check(self,dataset = None):
-        if None : dataset = self.dataset
-        for index,row in dataset.iterrows():#type: ignore
+        if dataset is None : dataset = self.dataset
+        for _,row in dataset.iterrows():#type: ignore
             if (self.ensemble.klass(row) != self.ensemble.klass(row,self.u)): #type: ignore
                 return False
         return True
