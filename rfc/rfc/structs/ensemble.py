@@ -7,6 +7,7 @@ from ..types import *
 from .utils import *
 from .feature import Feature
 from .tree import Tree
+from .utils import argmin
 
 def treeLevels(T: Tree, f: int | Feature) -> set[float]:
     levels = set()
@@ -79,14 +80,16 @@ class Ensemble(Iterable[Tree]):
         self,
         x: Sample,
         u: None | list[float] | dict[int, float] = None,
-        tiebreaker: None | Callable[[Iterable[int]], int] = None
+        tiebreaker: None | Callable[[Iterable[int]], int] | function = None
     ) -> int:
         p = self.p(x, u)
         if tiebreaker is None:
             return int(np.argmax(p))
+        if isinstance(tiebreaker,function):
+            return argmin(tiebreaker,np.argwhere(p == np.amax(p)))
         else:
             a = np.argwhere(p == np.amax(p))
-            return tiebreaker(a)
+            return tiebreaker(a)#type:ignore
 
     @property
     def numerical_features(self) -> tuple[Feature, ...]:

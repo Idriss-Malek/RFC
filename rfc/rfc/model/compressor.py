@@ -7,6 +7,7 @@ from ..structs.ensemble import Ensemble
 from ..structs.utils import idenumerate
 
 epsilon = 10e-4
+comp = lambda x,y : x<y
 
 class Compressor:
     dataset : pd.DataFrame
@@ -32,42 +33,57 @@ class Compressor:
         self.u = [1.0 for t,_ in idenumerate(ensemble)]
     
     def build(self):
-        self.mdl.setParam(gp.GRB.Param.Threads, 4)#type: ignore
+        self.mdl.setParam(gp.GRB.Param.Threads, 1)#type: ignore
         u = self.mdl.addVars(len(self.ensemble), vtype=gp.GRB.BINARY, name="u") #type: ignore
         for _,row in self.dataset.iterrows():
-            klass=self.ensemble.klass(row) #type: ignore
+            klass=self.ensemble.klass(row,tiebreaker = comp)  #type: ignore
             left_expr=gp.LinExpr() # type: ignore
             for c in range(self.ensemble.n_classes):
                 if c!=klass:
                     for t,_ in idenumerate(self.ensemble):
                         left_expr.add(u[t],self.ensemble.weights[t]*(self.ensemble[t].F(row,klass)-self.ensemble[t].F(row,c)))#type: ignore
-                    self.mdl.addConstr(left_expr >= epsilon)#type: ignore
+                    if comp(c,klass):
+                        self.mdl.addConstr(left_expr >= epsilon)#type: ignore
+                    else:
+                        self.mdl.addConstr(left_expr >= 0)#type: ignore
         self.mdl.addConstr(u.sum() >= 1, "sum_constraint")
         self.mdl.setObjective(u.sum(),sense=gp.GRB.MINIMIZE)#type: ignore
     def add(self, rows : list[dict]):
         self.dataset = self.dataset._append(rows, ignore_index=True)#type: ignore
         u = self.mdl.getVars()
         for row in rows:
-            klass=self.ensemble.klass(row) #type: ignore
+            klass=self.ensemble.klass(row,tiebreaker = comp)  #type: ignore
             left_expr=gp.LinExpr() # type: ignore
             for c in range(self.ensemble.n_classes):
                 if c!=klass:
                     for t,_ in idenumerate(self.ensemble):
                         left_expr.add(u[t],self.ensemble.weights[t]*(self.ensemble[t].F(row,klass)-self.ensemble[t].F(row,c)))#type: ignore
-                    self.mdl.addConstr(left_expr >= epsilon)#type: ignore
+                    if comp(c,klass):
+                        self.mdl.addConstr(left_expr >= epsilon)#type: ignore
+                    else:
+                        self.mdl.addConstr(left_expr >= 0)#type: ignore
         
     def solve(self):
         self.mdl.optimize()
-        self.u = [x.X for x in self.mdl.getVars()]
+        self.u = [round(x.X) for x in self.mdl.getVars()]
         return self.u
     
-    def check(self,dataset = None):
+    def check(self,dataset = None, rate = False):
         if dataset is None : dataset = self.dataset
-        for _,row in dataset.iterrows():#type: ignore
-            if (self.ensemble.klass(row) != self.ensemble.klass(row,self.u)): #type: ignore
-                return False
-        return True
-                
+        if not rate:
+            for _,row in dataset.iterrows():#type: ignore
+                if (self.ensemble.klass(row,tiebreaker = comp)  != self.ensemble.klass(row,self.u, tiebreaker = comp) ): #type: ignore
+                    return False
+            return True
+        else:
+            s=0
+            for _,row in dataset.iterrows():#type: ignore
+                s+=((self.ensemble.klass(row,tiebreaker = comp)  == self.ensemble.klass(row,self.u, tiebreaker = comp) )+0.) #type: ignore
+            return s/len(dataset)
+
+    
+    def update_dataset(self, df):
+        self.dataset = df
 
 if __name__ == '__main__':
     print('test')

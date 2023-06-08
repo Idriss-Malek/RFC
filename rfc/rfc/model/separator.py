@@ -6,7 +6,8 @@ import gurobipy as gp
 from ..structs.ensemble import Ensemble
 from ..structs.utils import idenumerate
 
-epsilon = 10e-4
+epsilon = 10e-3
+comp = lambda x,y : x<y
 
 class Separator:
     ensemble : Ensemble
@@ -53,7 +54,6 @@ class Separator:
         self.mdl.addConstrs((self.ksi[i] >= self.y[t,node.right.id] for i in binary_features_id for t,tree in idenumerate(self.ensemble) for node in tree.nodes_with_feature(i)))#type: ignore
 
     def build_mu(self):
-        epsilon = 10e-3
         numerical_features = [feature for feature in self.ensemble.features if feature.isnumerical()]
         self.mu = self.mdl.addVars([(feature.id,j) for feature in numerical_features for j in range(len(feature.levels)+1)],ub=[1.0 for feature in numerical_features for j in range(len(feature.levels)+1)],vtype=gp.GRB.CONTINUOUS, name="mu")#type:ignore
         self.mdl.addConstrs((self.mu[feature.id,j-1] >= self.mu[feature.id,j] for feature in numerical_features for j in range(1,len(feature.levels)+1)))#type: ignore
@@ -77,11 +77,11 @@ class Separator:
         self.mdl.addConstrs((self.zeta[k] == sum([self.u[t]*self.ensemble.weights[t]*tree.p(k)[v]*self.y[t,node.id] for t,tree in idenumerate(self.ensemble) for v,node in enumerate(tree.leaves)]) for k in [c,g]), 'zeta_definition')#type: ignore
 
     def build_class_constraint(self,c):
-        self.mdl.addConstrs((self.z[c] >= epsilon + self.z[g] for g in range(self.ensemble.n_classes) if c != g),'class_constraint')#type:ignore
+        self.mdl.addConstrs((self.z[c] >= epsilon + self.z[g] for g in range(self.ensemble.n_classes) if comp(g,c) else self.z[c] >= self.z[g]),'class_constraint')#type:ignore
 
     def build_mdl(self,c,g): 
         self.mdl = gp.Model(name = f'Separator_{c}_{g}')#type: ignore
-        self.mdl.setParam(gp.GRB.Param.Threads, 4)#type: ignore
+        self.mdl.setParam(gp.GRB.Param.Threads, 1)#type: ignore
         self.build_base()
         self.build_zeta(c,g)
         self.build_class_constraint(c)
