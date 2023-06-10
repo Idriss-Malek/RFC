@@ -77,11 +77,13 @@ class Separator:
         self.mdl.addConstrs((self.zeta[k] == sum([self.u[t]*self.ensemble.weights[t]*tree.p(k)[v]*self.y[t,node.id] for t,tree in idenumerate(self.ensemble) for v,node in enumerate(tree.leaves)]) for k in [c,g]), 'zeta_definition')#type: ignore
 
     def build_class_constraint(self,c):
-        self.mdl.addConstrs((self.z[c] >= epsilon + self.z[g] for g in range(self.ensemble.n_classes) if comp(g,c) else self.z[c] >= self.z[g]),'class_constraint')#type:ignore
+        self.mdl.addConstrs((self.z[c] >= epsilon + self.z[g] for g in range(self.ensemble.n_classes) if comp(g,c)),'class_constraint')#type:ignore
+        self.mdl.addConstrs((self.z[c] >= self.z[g] for g in range(self.ensemble.n_classes) if not comp(g,c)),'class_constraint')#type:ignore
+
 
     def build_mdl(self,c,g): 
         self.mdl = gp.Model(name = f'Separator_{c}_{g}')#type: ignore
-        self.mdl.setParam(gp.GRB.Param.Threads, 1)#type: ignore
+        self.mdl.setParam(gp.GRB.Param.Threads, 8)#type: ignore
         self.build_base()
         self.build_zeta(c,g)
         self.build_class_constraint(c)

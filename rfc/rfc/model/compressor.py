@@ -33,7 +33,7 @@ class Compressor:
         self.u = [1.0 for t,_ in idenumerate(ensemble)]
     
     def build(self):
-        self.mdl.setParam(gp.GRB.Param.Threads, 1)#type: ignore
+        self.mdl.setParam(gp.GRB.Param.Threads, 8)#type: ignore
         u = self.mdl.addVars(len(self.ensemble), vtype=gp.GRB.BINARY, name="u") #type: ignore
         for _,row in self.dataset.iterrows():
             klass=self.ensemble.klass(row,tiebreaker = comp)  #type: ignore

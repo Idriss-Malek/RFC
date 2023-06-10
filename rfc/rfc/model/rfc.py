@@ -52,6 +52,6 @@ class RFC:
                 self.compressor.add(sep)
         self.u = self.compressor.solve()
         so_far = time.time()
-        write_in_file(f'rfc_test3.csv',f"{len(self.dataset)},{iterations},{sum(self.u)},{so_far-initial},{self.compressor.check()},{self.compressor.check(self.test_dataset)} \n")
+        write_in_file(f'rfc_test4.csv',f"{len(self.dataset)},{iterations},{sum(self.u)},{so_far-initial},{self.compressor.check()},{self.compressor.check(self.test_dataset)} \n")
         return self.u
     

@@ -1,4 +1,5 @@
 import numpy as np
+import types
 
 from collections.abc import Iterable, Iterator, Callable
 from enum import Enum
@@ -80,13 +81,13 @@ class Ensemble(Iterable[Tree]):
         self,
         x: Sample,
         u: None | list[float] | dict[int, float] = None,
-        tiebreaker: None | Callable[[Iterable[int]], int] | function = None
+        tiebreaker: None | Callable[[Iterable[int]], int] | types.FunctionType = None
     ) -> int:
         p = self.p(x, u)
         if tiebreaker is None:
             return int(np.argmax(p))
-        if isinstance(tiebreaker,function):
-            return argmin(tiebreaker,np.argwhere(p == np.amax(p)))
+        if isinstance(tiebreaker,types.FunctionType):
+            return argmin(np.argwhere(p == np.amax(p)),tiebreaker)
         else:
             a = np.argwhere(p == np.amax(p))
             return tiebreaker(a)#type:ignore
