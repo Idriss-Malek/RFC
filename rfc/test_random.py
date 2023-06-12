@@ -9,7 +9,6 @@ nb = 1000
 
 if __name__ == '__main__':
     root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
-    """
     for i in range (1,11):
         train_dataset = root / f'datasets/FICO/FICO.train{i}.csv'
         test_dataset = root / f'datasets/FICO/FICO.test{i}.csv'
@@ -25,7 +24,7 @@ if __name__ == '__main__':
         rc.pick_dataset(nb)
         rc.solve()
         t2=time.time()
-        with open('random_compression_report.csv', 'a+') as f:
+        with open('random_compression_report1.csv', 'a+') as f:
                 f.write(f'\nFICO {i},{nb},{sum(rc.compressor.u)},{t2-t1},{rc.compressor.check(train_dataset,True)},{rc.compressor.check(test_dataset,True)}')
     
     for i in range (1,11):
@@ -43,7 +42,7 @@ if __name__ == '__main__':
         rc.pick_dataset(nb)
         rc.solve()
         t2=time.time()
-        with open('random_compression_report.csv', 'a+') as f:
+        with open('random_compression_report1.csv', 'a+') as f:
                 f.write(f'\nCOMPAS-ProPublica {i},{nb},{sum(rc.compressor.u)},{t2-t1},{rc.compressor.check(train_dataset,True)},{rc.compressor.check(test_dataset,True)}')
 
     for i in range (1,11):
@@ -61,7 +60,7 @@ if __name__ == '__main__':
         rc.pick_dataset(nb)
         rc.solve()
         t2=time.time()
-        with open('random_compression_report.csv', 'a+') as f:
+        with open('random_compression_report1.csv', 'a+') as f:
                 f.write(f'\nHTRU2 {i},{nb},{sum(rc.compressor.u)},{t2-t1},{rc.compressor.check(train_dataset,True)},{rc.compressor.check(test_dataset,True)}')
     for i in range (1,11):
         train_dataset = root / f'datasets/Pima-Diabetes/Pima-Diabetes.train{i}.csv'
@@ -78,9 +77,8 @@ if __name__ == '__main__':
         rc.pick_dataset(nb)
         rc.solve()
         t2=time.time()
-        with open('random_compression_report.csv', 'a+') as f:
+        with open('random_compression_report1.csv', 'a+') as f:
                 f.write(f'\nPima-Diabetes {i},{nb},{sum(rc.compressor.u)},{t2-t1},{rc.compressor.check(train_dataset,True)},{rc.compressor.check(test_dataset,True)}')
-    """
     for i in range (1,11):
         train_dataset = root / f'datasets/Breast-Cancer-Wisconsin/Breast-Cancer-Wisconsin.train{i}.csv'
         test_dataset = root / f'datasets/Breast-Cancer-Wisconsin/Breast-Cancer-Wisconsin.test{i}.csv'
@@ -96,7 +94,7 @@ if __name__ == '__main__':
         rc.pick_dataset(nb)
         rc.solve()
         t2=time.time()
-        with open('random_compression_report.csv', 'a+') as f:
+        with open('random_compression_report1.csv', 'a+') as f:
                 f.write(f'\nFICO {i},{nb},{sum(rc.compressor.u)},{t2-t1},{rc.compressor.check(train_dataset,True)},{rc.compressor.check(test_dataset,True)}')
     for i in range (1,11):
         train_dataset = root / f'datasets/Seeds/Seeds.train{i}.csv'
@@ -113,5 +111,5 @@ if __name__ == '__main__':
         rc.pick_dataset(nb)
         rc.solve()
         t2=time.time()
-        with open('random_compression_report.csv', 'a+') as f:
+        with open('random_compression_report1.csv', 'a+') as f:
                 f.write(f'\nFICO {i},{nb},{sum(rc.compressor.u)},{t2-t1},{rc.compressor.check(train_dataset,True)},{rc.compressor.check(test_dataset,True)}')
