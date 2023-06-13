@@ -1,4 +1,4 @@
-
+Ensemble, Number of random regions, Compression size, COmpression Time, Accuracy on trainset, Accuracy on testset
 FICO 1,1000,35,26.54315996170044,[0.99585679],[0.99808795]
 FICO 2,1000,35,17.944002389907837,[0.99458196],[0.99713193]
 FICO 3,1000,28,16.275707721710205,[0.99649421],[0.99713193]
