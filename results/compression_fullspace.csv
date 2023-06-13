@@ -1,3 +1,4 @@
+Ensemble, Size of the first compression set, Iterations, Compression size, Time, Lossless on trainset, Lossless on testset
 FICO 1, 1,65,100,960.8386645317078,True,True 
 FICO 2,1,50,99,364.78726053237915,True,True 
 FICO 3,1,55,100,414.88780999183655,True,True 
