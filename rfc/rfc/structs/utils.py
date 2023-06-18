@@ -13,7 +13,7 @@ def argmin( it, comp = None):
     x = it[0]
     if comp is None:
         comp = lambda a,b : a<b
-    for i in range(1,len(it)):
-        if comp(it[i],it[x]):
+    for i in it:
+        if comp(i,x):
             x = i
     return x

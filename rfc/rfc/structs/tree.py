@@ -65,6 +65,13 @@ class Tree(IdentifiedObject, Iterable[Node]):
             int: The class of the sample x.
         """
         return self.leaf(x).klass
+    
+    def path(self, x: Sample):
+        path = [self.root]
+        while not path[-1].is_leaf:
+            path.append(path[-1].split(x))
+        return path
+
 
     def F(self, x: Sample, c: int):
         """
