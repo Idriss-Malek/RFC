@@ -1,4 +1,4 @@
-
+Ensemble,Sample size, compression size, compression time, lossless on trainset, lossless on testset
 FICO 1,1000,33,22.512859344482422,0.99171359,0.98565966
 FICO 2,1000,27,17.718523025512695,0.99256348,0.99330784
 FICO 3,1000,31,15.053537130355835,0.99723786,0.99904398
