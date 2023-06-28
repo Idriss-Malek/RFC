@@ -181,3 +181,13 @@ class Tree(IdentifiedObject, Iterable[Node]):
         def filter__(node: Node) -> bool:
             return not node.is_leaf and (filter_ is None or filter_(node))
         return PreOrderIter(self.root, filter_=filter__)
+    
+    def new_tree(self,u):
+        s
+        if u[self.root.id] == 1:
+            f=self.root.id
+            for v in PreOrderIter(f)[1:]:
+                if u[v.id] == 1:
+                    a
+        else:
+            return None

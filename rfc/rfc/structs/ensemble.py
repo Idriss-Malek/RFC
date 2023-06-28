@@ -87,7 +87,7 @@ class Ensemble(Iterable[Tree]):
         if tiebreaker is None:
             return int(np.argmax(p))
         if isinstance(tiebreaker,types.FunctionType):
-            return argmin(np.argwhere(p == np.amax(p)),tiebreaker)
+            return argmin(np.argwhere(p == np.amax(p)),tiebreaker).item()
         else:
             a = np.argwhere(p == np.amax(p))
             return tiebreaker(a)#type:ignore

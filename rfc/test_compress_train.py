@@ -1,7 +1,7 @@
 import pandas as pd
 import pathlib
 
-from rfc.model import Compressor,Separator,RFC
+from rfc.model import Compressor
 from rfc.utils import load_tree_ensemble
 
 comp = lambda x,y : x<y

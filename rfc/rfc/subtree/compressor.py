@@ -1,12 +1,12 @@
 import pandas as pd
 import random as rd
-
+import copy 
 import gurobipy as gp
 
 from ..structs.ensemble import Ensemble
 from ..structs.utils import idenumerate
 
-epsilon = 10e-4
+epsilon = 10e-2
 comp = lambda x,y : x<y
 
 class Compressor:
@@ -31,37 +31,88 @@ class Compressor:
         self.lazy = lazy
         self.mdl = gp.Model(name = 'Compressor') # type: ignore
         self.u = {(t,v.id) : 1.0 for t,tree in idenumerate(self.ensemble) for v in tree}
-        self.f = {(t,v.id,c) : 1.0 for t,tree in idenumerate(self.ensemble) for v in tree for c in self.ensemble.n_classes}
+        self.f = {(t,v.id,c) : 1.0 for t,tree in idenumerate(self.ensemble) for v in tree for c in range(self.ensemble.n_classes)}
         self.u_vars = None
         self.f_vars = None
+        self.compressed = None
     def build(self):
         self.mdl.setParam(gp.GRB.Param.Threads, 8)#type: ignore
         self.u_vars = self.mdl.addVars([(t,v.id) for t,tree in idenumerate(self.ensemble) for v in tree], vtype=gp.GRB.BINARY, name="u") #type: ignore
-        self.f_vars = self.mdl.addVars([(t,v.id,c) for t,tree in idenumerate(self.ensemble) for v in tree for c in self.ensemble.n_classes], vtype=gp.GRB.BINARY, name="f") #type: ignore
+        self.f_vars = self.mdl.addVars([(t,v.id,c) for t,tree in idenumerate(self.ensemble) for v in tree for c in range(self.ensemble.n_classes)], vtype=gp.GRB.BINARY, name="f") #type: ignore
         u = self.u_vars
         f = self.f_vars
         self.mdl.addConstrs(u[(t,v.left.id)] == u[(t,v.right.id)] for t,tree in idenumerate(self.ensemble) for v in tree.nodes)
-        self.mdl.addConstrs(u[(t,v.id)] <= u[(t,v.parent.id)] for t,tree in idenumerate(self.ensemble) for v in tree if tree.root.id != v.id )
-        self.mdl.addConstrs(sum([f[t,v.id,c] for c in self.ensemble.n_classes]) == u[t,v.id] - u[t,v.left.id] for t,tree in idenumerate(self.ensemble) for v in tree.nodes)
-        self.mdl.addConstrs(f[t,v.id,c] == u[t,v.id]*((v.klass == c)+0.) for t,tree in idenumerate(self.ensemble) for v in tree.leaves for c in self.ensemble.n_classes )
-        
-        self.mdl.addConstrs(sum([self.ensemble.weights[t]*f[t,v.id,self.ensemble.klass(row,tiebreaker = comp)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= epsilon*((comp(c,self.ensemble.klass(row,tiebreaker = comp)))+0.) + sum([self.ensemble.weights[t]*f[t,v.id,c] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) for _,row in self.dataset.iterrows() for c in self.ensemble.n_classes )
-        
+        self.mdl.addConstrs(u[(t,v.id)] <= u[(t,v.parent.id)] for t,tree in idenumerate(self.ensemble) for v in tree if tree.root.id != v.id )#type:ignore
+        self.mdl.addConstrs(sum([f[(t,v.id,c)] for c in range(self.ensemble.n_classes)]) == u[t,v.id] - u[t,v.left.id] for t,tree in idenumerate(self.ensemble) for v in tree.nodes)
+        self.mdl.addConstrs(f[(t,v.id,c)] == u[t,v.id]*((v.klass == c)+0.) for t,tree in idenumerate(self.ensemble) for v in tree.leaves for c in range(self.ensemble.n_classes) )
+                
+        for c in range(self.ensemble.n_classes):
+            for _,row in self.dataset.iterrows():
+                klass=self.ensemble.klass(row,tiebreaker = comp)#type:ignore
+                if comp(c,klass):
+                    self.mdl.addConstr(sum([self.ensemble.weights[t]*f[(t,v.id,klass)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= epsilon + sum([self.ensemble.weights[t]*f[(t,v.id,c)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]))#type:ignore
+                else:
+                    self.mdl.addConstr(sum([self.ensemble.weights[t]*f[(t,v.id,klass)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= sum([self.ensemble.weights[t]*f[(t,v.id,c)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]))#type:ignore
         self.mdl.addConstr(u.sum() >= 1, "sum_constraint")
         self.mdl.setObjective(u.sum(),sense=gp.GRB.MINIMIZE)#type: ignore
     def add(self, rows : list[dict]):
         self.dataset = self.dataset._append(rows, ignore_index=True)#type: ignore
         u = self.u_vars
         f = self.f_vars
-        self.mdl.addConstrs(sum([self.ensemble.weights[t]*f[t,v.id,self.ensemble.klass(row,tiebreaker = comp)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= epsilon*((comp(c,self.ensemble.klass(row,tiebreaker = comp)))+0.) + sum([self.ensemble.weights[t]*f[t,v.id,c] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) for row in rows for c in self.ensemble.n_classes )
-        
+        for c in range(self.ensemble.n_classes):
+            for row in rows:
+                klass=self.ensemble.klass(row,tiebreaker = comp)#type:ignore
+                if comp(c,klass):
+                    self.mdl.addConstr(sum([self.ensemble.weights[t]*f[(t,v.id,klass)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= epsilon + sum([self.ensemble.weights[t]*f[(t,v.id,c)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]))#type:ignore
+                else:
+                    self.mdl.addConstr(sum([self.ensemble.weights[t]*f[(t,v.id,klass)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= sum([self.ensemble.weights[t]*f[(t,v.id,c)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]))#type:ignore        
     def solve(self):
         self.mdl.optimize()
-        self.u = [round(x.X) for x in self.u_vars]
-        self.f = [round(x.X) for x in self.f_vars]
+        self.u = {key: round(x.X) for key,x in self.u_vars.items()}#type:ignore
+        self.f = {key: round(x.X) for key,x in self.f_vars.items()}#type:ignore
+
+
+    def new_ensemble(self):
+        trees=[]
+        for t,tree in idenumerate(self.ensemble):
+            new_tree = copy.deepcopy(tree)
+            s=0
+            if self.u[(t,new_tree.root.id)] == 1:#type:ignore
+                for v in new_tree:
+                    if self.u[(t,v.id)] == 1:
+                        for c in range(self.ensemble.n_classes):
+                            if self.f[(t,v.id,c)] == 1:#type:ignore
+                                v.children = tuple()
+                                v.klass = c
+                                break
+                new_tree.id = s
+                s += 1
+                trees.append(new_tree)
+        self.compressed = Ensemble(self.ensemble.features,trees, self.ensemble.n_classes)#type:ignore
+        return self.compressed
+                
     
     def check(self,dataset = None, rate = False):
-        raise NotImplementedError
+        if not rate :
+            for _,row in dataset.iterrows():#type:ignore
+                if not self.ensemble.klass(row,tiebreaker = comp) == self.compressed.klass(row,tiebreaker = comp):#type:ignore
+                    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+                    for c in range (self.ensemble.n_classes):
+                        klass=self.ensemble.klass(row,tiebreaker = comp)#type:ignore
+                        if comp(c,klass):
+                            print(sum([self.ensemble.weights[t]*self.f[(t,v.id,klass)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= epsilon + sum([self.ensemble.weights[t]*self.f[(t,v.id,c)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]))#type:ignore
+                        else:
+                            print(sum([self.ensemble.weights[t]*self.f[(t,v.id,klass)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= sum([self.ensemble.weights[t]*self.f[(t,v.id,c)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]))#type:ignore        
+                    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX') 
+                    return False
+            return True
+        else:
+            s = 0
+            for _,row in dataset.iterrows():#type:ignore
+                if self.ensemble.klass(row,tiebreaker = comp) == self.compressed.klass(row,tiebreaker = comp):#type:ignore
+                    s += 1
+            return s/len(dataset)#type:ignore
+
 
     
     def update_dataset(self, df):
