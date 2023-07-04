@@ -1,0 +1,81 @@
+DATASET_NAME: FICO.train5.csv
+ENSEMBLE: RF
+NB_TREES: 3
+NB_FEATURES: 17
+NB_CLASSES: 2
+MAX_TREE_DEPTH: 3
+Format: node / node type (LN - leave node, IN - internal node) left child / right child / feature / threshold / node_depth / majority class (starts with index 0)
+
+[FEATURES] 
+ExternalRiskEstimate<0.49 : B 
+ExternalRiskEstimate<0.65 : B 
+ExternalRiskEstimate<0.80 : B 
+NumSatisfactoryTrades<0.5 : B 
+TradeOpenTime<0.6 : B 
+TradeOpenTime<0.85 : B 
+TradeFrequency<0.45 : B 
+TradeFrequency<0.6 : B 
+Delinquency<0.55 : B 
+Delinquency<0.75 : B 
+Installment<0.5 : B 
+Installment<0.7 : B 
+Inquiry<0.75 : B 
+RevolvingBalance<0.4 : B 
+RevolvingBalance<0.6 : B 
+Utilization<0.6 : B 
+TradeWBalance<0.33 : B 
+
+[TREE 0]
+NB_NODES: 15
+0 IN 1 8 0 0.5 0 -1
+1 IN 2 5 14 0.5 1 -1
+2 IN 3 4 2 0.5 2 -1
+3 LN -1 -1 -1 -1 3 0
+4 LN -1 -1 -1 -1 3 0
+5 IN 6 7 9 0.5 2 -1
+6 LN -1 -1 -1 -1 3 0
+7 LN -1 -1 -1 -1 3 0
+8 IN 9 12 5 0.5 1 -1
+9 IN 10 11 12 0.5 2 -1
+10 LN -1 -1 -1 -1 3 0
+11 LN -1 -1 -1 -1 3 1
+12 IN 13 14 8 0.5 2 -1
+13 LN -1 -1 -1 -1 3 1
+14 LN -1 -1 -1 -1 3 1
+
+[TREE 1]
+NB_NODES: 15
+0 IN 1 8 8 0.5 0 -1
+1 IN 2 5 1 0.5 1 -1
+2 IN 3 4 16 0.5 2 -1
+3 LN -1 -1 -1 -1 3 0
+4 LN -1 -1 -1 -1 3 0
+5 IN 6 7 0 0.5 2 -1
+6 LN -1 -1 -1 -1 3 0
+7 LN -1 -1 -1 -1 3 1
+8 IN 9 12 2 0.5 1 -1
+9 IN 10 11 4 0.5 2 -1
+10 LN -1 -1 -1 -1 3 0
+11 LN -1 -1 -1 -1 3 1
+12 IN 13 14 0 0.5 2 -1
+13 LN -1 -1 -1 -1 3 0
+14 LN -1 -1 -1 -1 3 1
+
+[TREE 2]
+NB_NODES: 15
+0 IN 1 8 1 0.5 0 -1
+1 IN 2 5 2 0.5 1 -1
+2 IN 3 4 10 0.5 2 -1
+3 LN -1 -1 -1 -1 3 0
+4 LN -1 -1 -1 -1 3 0
+5 IN 6 7 5 0.5 2 -1
+6 LN -1 -1 -1 -1 3 0
+7 LN -1 -1 -1 -1 3 0
+8 IN 9 12 14 0.5 1 -1
+9 IN 10 11 0 0.5 2 -1
+10 LN -1 -1 -1 -1 3 0
+11 LN -1 -1 -1 -1 3 1
+12 IN 13 14 8 0.5 2 -1
+13 LN -1 -1 -1 -1 3 1
+14 LN -1 -1 -1 -1 3 1
+

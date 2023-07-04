@@ -63,7 +63,7 @@ def exportTreeCollection(datasetName, ensemble, runcount, numFeatures, numClasse
     maxTreeDepth = []
     for tree in range(len(n_nodes)):
         maxTreeDepth.append(max(node_depth[tree]))
-    with open(str(rf_dir / datasetName / datasetName) +'.big'+ ".{}{}.txt".format(ensemble,runcount),"w+") as f:
+    with open(str(rf_dir / datasetName / datasetName) +'.little'+ ".{}{}.txt".format(ensemble,runcount),"w+") as f:
         f.write("DATASET_NAME: " + datasetName.split('/')[-1] + ".train{}.csv\n".format(runcount))
         f.write("ENSEMBLE: " + ensemble +"\n")
         f.write("NB_TREES: %s\n" %(len(n_nodes)))

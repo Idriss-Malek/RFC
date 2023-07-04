@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import random as rd
 import copy 
 import gurobipy as gp
@@ -95,15 +96,7 @@ class Compressor:
     def check(self,dataset = None, rate = False):
         if not rate :
             for _,row in dataset.iterrows():#type:ignore
-                if not self.ensemble.klass(row,tiebreaker = comp) == self.compressed.klass(row,tiebreaker = comp):#type:ignore
-                    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-                    for c in range (self.ensemble.n_classes):
-                        klass=self.ensemble.klass(row,tiebreaker = comp)#type:ignore
-                        if comp(c,klass):
-                            print(sum([self.ensemble.weights[t]*self.f[(t,v.id,klass)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= epsilon + sum([self.ensemble.weights[t]*self.f[(t,v.id,c)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]))#type:ignore
-                        else:
-                            print(sum([self.ensemble.weights[t]*self.f[(t,v.id,klass)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= sum([self.ensemble.weights[t]*self.f[(t,v.id,c)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]))#type:ignore        
-                    print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX') 
+                if self.ensemble.klass(row,tiebreaker = comp) != self.compressed.klass(row,tiebreaker = comp):#type:ignore
                     return False
             return True
         else:

@@ -67,11 +67,7 @@ class Ensemble(Iterable[Tree]):
         return w
 
     def F(self, x: Sample):
-        F = np.empty((self.n_classes, len(self)))
-        for c in range(self.n_classes):
-            for t, T in idenumerate(self):
-                F[c, t] = T.F(x, c)
-        return F
+        return np.array([[tree.F(x,c) for t,tree in idenumerate(self)] for c in range( self.n_classes)])
 
     def p(self, x: Sample, u: None | list[float] | dict[int, float] = None):
         w = self.w(u)
