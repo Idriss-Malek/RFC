@@ -35,10 +35,6 @@ if __name__ == '__main__':
             compressor.build()
             compressor.solve()
             compressor.new_ensemble()
-            #print(RenderTree(compressor.ensemble[0].root))
-            #print(RenderTree(compressor.compressed[0].root))
-            #print([compressor.u[(1,v.id)] for v in ensemble[1]])
-            #print([(compressor.u[(1,v.id)],v) for v in ensemble[1]])
 
             acc1 = 0
             acc2 = 0

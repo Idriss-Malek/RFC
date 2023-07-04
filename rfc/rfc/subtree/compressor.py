@@ -55,7 +55,8 @@ class Compressor:
                 else:
                     self.mdl.addConstr(sum([self.ensemble.weights[t]*f[(t,v.id,klass)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]) >= sum([self.ensemble.weights[t]*f[(t,v.id,c)] for t,tree in idenumerate(self.ensemble) for v in tree.path(row)]))#type:ignore
         self.mdl.addConstr(u.sum() >= 1, "sum_constraint")
-        self.mdl.setObjective(u.sum(),sense=gp.GRB.MINIMIZE)#type: ignore
+        #self.mdl.setObjective(u.sum(),sense=gp.GRB.MINIMIZE)#type: ignore
+        self.mdl.setObjective(sum([u[t,tree.root.id] for t,tree in idenumerate(self.ensemble)]),sense=gp.GRB.MINIMIZE)#type: ignore
     def add(self, rows : list[dict]):
         self.dataset = self.dataset._append(rows, ignore_index=True)#type: ignore
         u = self.u_vars
