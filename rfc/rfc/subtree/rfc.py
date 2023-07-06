@@ -24,7 +24,7 @@ class RFC:
         self.ensemble = ensemble
         self.dataset = dataset
         self.compressor = Compressor(ensemble,dataset)
-        self.separator = Separator(ensemble,self.compressor.compressed)#type:ignore
+        self.separator = Separator(ensemble,self.compressor.compressed,self.compressor.features)#type:ignore
         self.test_dataset = test_dataset
 
 
@@ -44,13 +44,13 @@ class RFC:
             self.separator.update_compressed(compressed)
             sep=self.separator.find_all()
             if not sep:
-                write_in_file(f'rfc_test3.csv',f"{i},{len(self.ensemble)},{len(compressed)},{len(self.compressor.u)},{sum(self.compressor.u)},{so_far-initial},{self.compressor.check()},{self.compressor.check(self.test_dataset)} \n")#type:ignore
+                write_in_file('subtree_sep.csv',f"{i},{len(self.ensemble)},{len(compressed)},{len(self.compressor.u)},{sum(self.compressor.u.values())},{so_far-initial},{self.compressor.check()},{self.compressor.check(self.test_dataset)} \n")#type:ignore
                 return compressed
             else:
                 self.compressor.add(sep)
         self.compressor.solve()
         compressed = self.compressor.new_ensemble()
         so_far = time.time()
-        write_in_file(f'rfc_test3.csv',f"{i},{len(self.ensemble)},{len(compressed)},{len(self.compressor.u)},{sum(self.compressor.u)},{so_far-initial},{self.compressor.check()},{self.compressor.check(self.test_dataset)} \n")#type:ignore
+        write_in_file('subtree_sep.csv',f"{i},{len(self.ensemble)},{len(compressed)},{len(self.compressor.u)},{sum(self.compressor.u.values())},{so_far-initial},{self.compressor.check()},{self.compressor.check(self.test_dataset)} \n")#type:ignore
         return compressed
     

@@ -1,11 +1,13 @@
 import pandas as pd
 import pathlib
 
-from rfc.model import Compressor,Separator,RFC
+from rfc.subtree import RFC
 from rfc.utils import load_tree_ensemble
 
 if __name__ == '__main__':
     root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
+    with open('subtree_sep.csv', 'a+') as f:
+        f.write('Ensemble, Iterations,Size original, Size compressed, Nb nodes original, Nb nodes compressed,compression time,lossless on train, lossless on test\n')
     for i in range (1,2):
         dataset = root / f'datasets/Pima-Diabetes/Pima-Diabetes.train{i}.csv'
         test_dataset = root / f'datasets/Pima-Diabetes/Pima-Diabetes.test{i}.csv'
@@ -17,6 +19,8 @@ if __name__ == '__main__':
         ensemble = str(ensemble)
         ensemble = load_tree_ensemble(ensemble, log_output=False)
         dataset = dataset[:1]
+        with open('subtree_sep.csv', 'a+') as f:
+            f.write(f'Pima-Diabetes{i},')
         rfc = RFC(ensemble,dataset,test_dataset)
         rfc.solve(iterations=1000)
     for i in range (1,2):
@@ -30,6 +34,8 @@ if __name__ == '__main__':
         ensemble = str(ensemble)
         ensemble = load_tree_ensemble(ensemble, log_output=False)
         dataset = dataset[:1]
+        with open('subtree_sep.csv', 'a+') as f:
+            f.write(f'FICO{i},')
         rfc = RFC(ensemble,dataset,test_dataset)
         rfc.solve(iterations=1000)
     for i in range (1,2):
@@ -43,6 +49,8 @@ if __name__ == '__main__':
         ensemble = str(ensemble)
         ensemble = load_tree_ensemble(ensemble, log_output=False)
         dataset = dataset[:1]
+        with open('subtree_sep.csv', 'a+') as f:
+            f.write(f'HTRU2{i},')
         rfc = RFC(ensemble,dataset,test_dataset)
         rfc.solve(iterations=1000)
     for i in range (1,2):
@@ -56,6 +64,8 @@ if __name__ == '__main__':
         ensemble = str(ensemble)
         ensemble = load_tree_ensemble(ensemble, log_output=False)
         dataset = dataset[:1]
+        with open('subtree_sep.csv', 'a+') as f:
+            f.write(f'COMPAS-ProPublica{i},')
         rfc = RFC(ensemble,dataset,test_dataset)
         rfc.solve(iterations=1000)
    

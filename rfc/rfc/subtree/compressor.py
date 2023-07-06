@@ -36,6 +36,7 @@ class Compressor:
         self.u_vars = None
         self.f_vars = None
         self.compressed = None
+        self.features = copy.deepcopy(self.ensemble.features)
     def build(self):
         self.mdl.setParam(gp.GRB.Param.Threads, 8)#type: ignore
         self.u_vars = self.mdl.addVars([(t,v.id) for t,tree in idenumerate(self.ensemble) for v in tree], vtype=gp.GRB.BINARY, name="u") #type: ignore
@@ -78,7 +79,6 @@ class Compressor:
         trees=[]
         for t,tree in idenumerate(self.ensemble):
             new_tree = copy.deepcopy(tree)
-            s=0
             if self.u[(t,new_tree.root.id)] == 1:#type:ignore
                 for v in new_tree:
                     if self.u[(t,v.id)] == 1:
@@ -87,15 +87,18 @@ class Compressor:
                                 v.children = tuple()
                                 v.klass = c
                                 break
-                new_tree.id = s
-                s += 1
                 trees.append(new_tree)
+        for i in range(len(trees)):
+            trees[i].id = i
         self.compressed = Ensemble(self.ensemble.features,trees, self.ensemble.n_classes)#type:ignore
         return self.compressed
                 
     
     def check(self,dataset = None, rate = False):
+        if dataset is None:
+            dataset = self.dataset
         if not rate :
+            print(dataset)
             for _,row in dataset.iterrows():#type:ignore
                 if self.ensemble.klass(row,tiebreaker = comp) != self.compressed.klass(row,tiebreaker = comp):#type:ignore
                     return False

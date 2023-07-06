@@ -17,12 +17,13 @@ class Separator:
         self,
         ensemble: Ensemble,
         compressed : Ensemble,
+        features,
         lazy: bool = False
     ) -> None:
         if not isinstance(ensemble, Ensemble):
             raise TypeError('ensemble must be a TreeEnsemble')
-        if not isinstance(compressed, Ensemble):
-            raise TypeError('ensemble must be a TreeEnsemble')
+        if not isinstance(compressed, Ensemble | None):
+            raise TypeError('ensemble must be a TreeEnsemble or None')
         if not isinstance(lazy, bool):
             raise TypeError('lazy must be a boolean')
         self.ensemble = ensemble
@@ -31,11 +32,14 @@ class Separator:
         self.sep = []
         self.mdl = None #type: ignore
         self.y = None
+        self.y_comp = None
         self.lbd = None
+        self.lbd_comp = None
         self.ksi = None
         self.mu = None
         self.z = None
         self.zeta = None
+        self.features = features
     
     def update_compressed(self,compressed):
         self.compressed = compressed
@@ -44,25 +48,42 @@ class Separator:
         self.y = self.mdl.addVars([(t,node.id) for t,tree in idenumerate(self.ensemble) for node in tree],ub=[1.0 for t,tree in idenumerate(self.ensemble) for node in tree],vtype=gp.GRB.CONTINUOUS, name="y") #type: ignore
         self.mdl.addConstrs((self.y[t,tree.root.id] == 1. for t,tree in idenumerate(self.ensemble)))#type: ignore
         self.mdl.addConstrs((self.y[t,node.id] == self.y[t,node.left.id] + self.y[t,node.right.id] for t,tree in idenumerate(self.ensemble) for node in tree.nodes))#type: ignore
+        self.y_comp = self.mdl.addVars([(t,node.id) for t,tree in idenumerate(self.compressed) for node in tree],ub=[1.0 for t,tree in idenumerate(self.compressed) for node in tree],vtype=gp.GRB.CONTINUOUS, name="y_comp") #type: ignore
+        self.mdl.addConstrs((self.y_comp[t,tree.root.id] == 1. for t,tree in idenumerate(self.compressed)))#type: ignore
+        self.mdl.addConstrs((self.y_comp[t,node.id] == self.y_comp[t,node.left.id] + self.y_comp[t,node.right.id] for t,tree in idenumerate(self.compressed) for node in tree.nodes))#type: ignore
     
     def build_lbd(self):
         self.lbd = self.mdl.addVars([(t,d) for t,tree in idenumerate(self.ensemble) for d in range(tree.depth+1)], vtype=gp.GRB.BINARY, name="lbd") #type: ignore
+        self.lbd_comp = self.mdl.addVars([(t,d) for t,tree in idenumerate(self.compressed) for d in range(tree.depth+1)], vtype=gp.GRB.BINARY, name="lbd_comp") #type: ignore
+        
         self.mdl.addConstrs((self.lbd[t,d] >= sum([self.y[t,node.left.id] for node in tree.nodes_at_depth(d)]) for t,tree in idenumerate(self.ensemble) for d in range(tree.depth))) #type: ignore
         self.mdl.addConstrs((1-self.lbd[t,d] >= sum([self.y[t,node.right.id] for node in tree.nodes_at_depth(d)]) for t,tree in idenumerate(self.ensemble) for d in range(tree.depth))) #type: ignore
 
+        self.mdl.addConstrs((self.lbd_comp[t,d] >= sum([self.y_comp[t,node.left.id] for node in tree.nodes_at_depth(d)]) for t,tree in idenumerate(self.compressed) for d in range(tree.depth))) #type: ignore
+        self.mdl.addConstrs((1-self.lbd_comp[t,d] >= sum([self.y_comp[t,node.right.id] for node in tree.nodes_at_depth(d)]) for t,tree in idenumerate(self.compressed) for d in range(tree.depth))) #type: ignore
+
     def build_ksi(self):
-        binary_features_id = [feature.id for feature in self.ensemble.features if feature.isbinary()]
+        binary_features_id = [feature.id for feature in self.features if feature.isbinary()]
         self.ksi = self.mdl.addVars(binary_features_id,vtype=gp.GRB.BINARY,name='ksi')#type: ignore
+
         self.mdl.addConstrs((self.ksi[i] <= 1 - self.y[t,node.left.id] for i in binary_features_id for t,tree in idenumerate(self.ensemble) for node in tree.nodes_with_feature(i)))#type: ignore
         self.mdl.addConstrs((self.ksi[i] >= self.y[t,node.right.id] for i in binary_features_id for t,tree in idenumerate(self.ensemble) for node in tree.nodes_with_feature(i)))#type: ignore
 
+        self.mdl.addConstrs((self.ksi[i] <= 1 - self.y_comp[t,node.left.id] for i in binary_features_id for t,tree in idenumerate(self.compressed) for node in tree.nodes_with_feature(i)))#type: ignore
+        self.mdl.addConstrs((self.ksi[i] >= self.y_comp[t,node.right.id] for i in binary_features_id for t,tree in idenumerate(self.compressed) for node in tree.nodes_with_feature(i)))#type: ignore
+
     def build_mu(self):
-        numerical_features = [feature for feature in self.ensemble.features if feature.isnumerical()]
+        numerical_features = [feature for feature in self.features if feature.isnumerical()]
         self.mu = self.mdl.addVars([(feature.id,j) for feature in numerical_features for j in range(len(feature.levels)+1)],ub=[1.0 for feature in numerical_features for j in range(len(feature.levels)+1)],vtype=gp.GRB.CONTINUOUS, name="mu")#type:ignore
         self.mdl.addConstrs((self.mu[feature.id,j-1] >= self.mu[feature.id,j] for feature in numerical_features for j in range(1,len(feature.levels)+1)))#type: ignore
+
         self.mdl.addConstrs((self.mu[feature.id,j] <= 1 - self.y[t,node.left.id] for feature in numerical_features for t,tree in idenumerate(self.ensemble) for j in range(1,len(feature.levels)+1) for node in tree.nodes_with_feature_and_level(feature,([feature.levels[0]-1]+feature.levels)[j])))#type: ignore
         self.mdl.addConstrs((self.mu[feature.id,j-1] >= self.y[t,node.right.id] for feature in numerical_features for t,tree in idenumerate(self.ensemble) for j in range(1,len(feature.levels)+1) for node in tree.nodes_with_feature_and_level(feature,([feature.levels[0]-1]+feature.levels)[j])))#type: ignore
         self.mdl.addConstrs((self.mu[feature.id,j] >= epsilon * self.y[t,node.right.id] for feature in numerical_features for t,tree in idenumerate(self.ensemble) for j in range(1,len(feature.levels)+1) for node in tree.nodes_with_feature_and_level(feature,([feature.levels[0]-1]+feature.levels)[j])))#type: ignore
+
+        self.mdl.addConstrs((self.mu[feature.id,j] <= 1 - self.y_comp[t,node.left.id] for feature in numerical_features for t,tree in idenumerate(self.compressed) for j in range(1,len(feature.levels)+1) for node in tree.nodes_with_feature_and_level(feature,([feature.levels[0]-1]+feature.levels)[j])))#type: ignore
+        self.mdl.addConstrs((self.mu[feature.id,j-1] >= self.y_comp[t,node.right.id] for feature in numerical_features for t,tree in idenumerate(self.compressed) for j in range(1,len(feature.levels)+1) for node in tree.nodes_with_feature_and_level(feature,([feature.levels[0]-1]+feature.levels)[j])))#type: ignore
+        self.mdl.addConstrs((self.mu[feature.id,j] >= epsilon * self.y_comp[t,node.right.id] for feature in numerical_features for t,tree in idenumerate(self.compressed) for j in range(1,len(feature.levels)+1) for node in tree.nodes_with_feature_and_level(feature,([feature.levels[0]-1]+feature.levels)[j])))#type: ignore
 
     def build_z(self):
         self.z = self.mdl.addVars(self.ensemble.n_classes,vtype=gp.GRB.CONTINUOUS,name='z')#type: ignore
@@ -77,7 +98,7 @@ class Separator:
 
     def build_zeta(self,c,g):
         self.zeta = self.mdl.addVars([c,g],vtype=gp.GRB.CONTINUOUS,name='zeta')#type: ignore
-        self.mdl.addConstrs((self.zeta[k] == sum([self.ensemble.weights[t]*tree.p(k)[v]*self.y[t,node.id] for t,tree in idenumerate(self.compressed) for v,node in enumerate(tree.leaves)]) for k in [c,g]), 'zeta_definition')#type: ignore
+        self.mdl.addConstrs((self.zeta[k] == sum([self.ensemble.weights[t]*tree.p(k)[v]*self.y_comp[t,node.id] for t,tree in idenumerate(self.compressed) for v,node in enumerate(tree.leaves)]) for k in [c,g]), 'zeta_definition')#type: ignore
 
     def build_class_constraint(self,c):
         self.mdl.addConstrs((self.z[c] >= epsilon + self.z[g] for g in range(self.ensemble.n_classes) if comp(g,c)),'class_constraint')#type:ignore
@@ -94,7 +115,7 @@ class Separator:
     
     def get_X(self):
         row = {}
-        for feature in self.ensemble.features:
+        for feature in self.features:
             if feature.isbinary():
                 row[feature.id] = self.ksi[feature.id].X#type: ignore
             if feature.isnumerical():
@@ -121,7 +142,7 @@ class Separator:
                         print(c,g)
                         print(self.ensemble.klass(row,tiebreaker = comp))#type:ignore
                         print(self.compressed.klass(row,tiebreaker = comp))#type:ignore
-                        if self.ensemble.klass(row,tiebreaker = comp) != self.compressed.klass(row,,tiebreaker = comp):#type:ignore
+                        if self.ensemble.klass(row,tiebreaker = comp) != self.compressed.klass(row,tiebreaker = comp):#type:ignore
                             rows.append(row)
         return rows
 
