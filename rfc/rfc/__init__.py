@@ -7,6 +7,6 @@ __author__ = "idmalek"
 __author_email__ = "idrissmalek80@gmail.com"
 __description__ = """A Tree Ensemble Compressor Python Library.."""
 __url__ = "https://github.com/Idriss-Malek/RFC"
-__all__ = ["model", "structs", "utils", "subtree"]
+__all__ = ["model", "structs", "utils", "subtree", "heuristic"]
 
-from . import (model, structs, utils, subtree)
+from . import (model, structs, utils, subtree, heuristic)
