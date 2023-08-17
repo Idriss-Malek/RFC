@@ -11,7 +11,7 @@ if __name__ == '__main__':
     with open('test_greedy.csv', 'a+') as f:
         f.write(f'Ensemble,Tuple size, Original size, Compressed size,  Original accuracy on testset , Compressed accuracy on testset, time\n')
 
-    for word in ['FICO', 'HTRU2','Pima-Diabetes','COMPAS-ProPublica']:        
+    for word in ['FICO', 'HTRU2','Pima-Diabetes','COMPAS-ProPublica']:  
         for i in range (1,11):
             dataset = root / f'datasets/{word}/{word}.train{i}.csv'
             test_dataset = root / f'datasets/{word}/{word}.test{i}.csv'
@@ -23,9 +23,10 @@ if __name__ == '__main__':
             ensemble = str(ensemble)
             ensemble = load_tree_ensemble(ensemble, log_output=False)
             greedy = GreedyCompressor(ensemble, dataset)
-            for j in range(1,3):
+            for j in range(1):
+                print(word , i)
                 t1 = time.time()
-                greedy.solve(iterations=100,tuples=j)
+                greedy.solve()
                 t2 = time.time()
                 acc1=0
                 acc2=0
@@ -37,4 +38,6 @@ if __name__ == '__main__':
                 
                 with open('test_greedy.csv', 'a+') as f:
                     f.write(f'{word} {i}, {j}, {len(greedy.u)}, {sum(greedy.u)},{acc1} ,{acc2}, {t2 - t1} \n')
+
+            
         

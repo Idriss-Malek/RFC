@@ -56,7 +56,7 @@ class Ensemble(Iterable[Tree]):
             raise TypeError(f"type_ must be str or TreeEnsembleType, not {type(type_)}")
         updateLevels(self.numerical_features, self.__trees)
 
-    def w(self, u: None | list[float] | dict[int, float] = None):
+    def w(self, u: None | list[float] | dict[int, float] | np.ndarray = None):
         w = self.weights.copy()
         if u is not None:
             for t, _ in idenumerate(self):
@@ -69,14 +69,14 @@ class Ensemble(Iterable[Tree]):
     def F(self, x: Sample):
         return np.array([[tree.F(x,c) for t,tree in idenumerate(self)] for c in range( self.n_classes)])
 
-    def p(self, x: Sample, u: None | list[float] | dict[int, float] = None):
+    def p(self, x: Sample, u: None | list[float] | dict[int, float] | np.ndarray = None):
         w = self.w(u)
         return self.F(x).dot(w)
 
     def klass(
         self,
         x: Sample,
-        u: None | list[float] | dict[int, float] = None,
+        u: None | list[float] | dict[int, float] | np.ndarray  = None,
         tiebreaker: None | Callable[[Iterable[int]], int] | types.FunctionType = None
     ) -> int:
         p = self.p(x, u)

@@ -1,0 +1,14 @@
+Ensemble, Iterations,Size original, Size compressed, Nb nodes original, Nb nodes compressed,compression time,lossless on train, lossless on test
+Pima-Diabetes1,79,100,94,1492,1138,3481.0144600868225,True,True 
+FICO1,Ensemble, Iterations,Size original, Size compressed, Nb nodes original, Nb nodes compressed,compression time,lossless on train, lossless on test
+Pima-Diabetes1,79,100,94,1492,1138,3458.260922193527,True,True 
+Pima-Diabetes2,77,100,84,1492,1008,1553.932801246643,True,True 
+Pima-Diabetes3,68,100,92,1496,1066,1636.0432851314545,True,True 
+Pima-Diabetes4,88,100,98,1490,1176,8917.15133357048,True,True 
+Pima-Diabetes5,74,100,95,1494,1129,4712.106829404831,True,True 
+Pima-Diabetes6,92,100,96,1500,1154,2146.016492843628,True,True 
+Pima-Diabetes7,84,100,100,1496,1222,8520.493201971054,True,True 
+Pima-Diabetes8,97,100,93,1494,1167,5450.112761735916,True,True 
+Pima-Diabetes9,84,100,96,1490,1146,3020.7749860286713,True,True 
+Pima-Diabetes10,77,100,100,1496,1168,4851.8160853385925,True,True 
+FICO1,
