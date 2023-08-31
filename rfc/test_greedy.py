@@ -11,8 +11,10 @@ if __name__ == '__main__':
     with open('test_greedy.csv', 'a+') as f:
         f.write(f'Ensemble,Tuple size, Original size, Compressed size,  Original accuracy on testset , Compressed accuracy on testset, time\n')
 
-    for word in ['FICO', 'HTRU2','Pima-Diabetes','COMPAS-ProPublica']:  
+    for word in [ 'HTRU2','Pima-Diabetes','COMPAS-ProPublica']:  
         for i in range (1,11):
+            if word == 'HTRU2' and i <= 2:
+                pass
             dataset = root / f'datasets/{word}/{word}.train{i}.csv'
             test_dataset = root / f'datasets/{word}/{word}.test{i}.csv'
             ensemble = root / f'forests/{word}/{word}.RF{i}.txt'
