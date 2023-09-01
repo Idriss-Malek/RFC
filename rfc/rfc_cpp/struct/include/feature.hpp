@@ -14,10 +14,8 @@ public:
     int id;
     std::string name;
     FeatureType type;
-    std::vector<float> levels;
-    std::vector<int> categories;
 
-    Feature(int id_, FeatureType type_, std::string name, std::vector<float> levels, std::vector<int> categories);
+    Feature(int id_, FeatureType type_, std::string name);
 
     bool isnumerical();
 

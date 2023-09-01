@@ -6,6 +6,7 @@
 
 struct Numpy{
         std::vector<int> array;
+        Numpy(std::vector<int> array);
         int size();
         int& operator[](int index);
     };
@@ -15,6 +16,8 @@ class Prob{
 public:
     std::vector<Numpy> probs;
 
-    Prob update(Numpy a);
+    Prob(std::vector<Numpy>);
+
+    void update(Numpy a);
 
 };

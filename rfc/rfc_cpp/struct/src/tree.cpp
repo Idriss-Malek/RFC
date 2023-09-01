@@ -3,9 +3,9 @@
 #include <iostream>
 #include <vector>
 #include <variant>
-#include "feature.hpp"
-#include "node.hpp"
-#include "tree.hpp"
+#include "../include/feature.hpp"
+#include "../include/node.hpp"
+#include "../include/tree.hpp"
 
 Tree::Tree(int id_, Node* root_, std::string name_){
     this->id = id_;

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <variant>
-#include "feature.hpp"
-#include "tree.hpp"
+#include "../include/feature.hpp"
+#include "../include/tree.hpp"
 
 Node::Node(int id_,Feature* feature_ = nullptr, float thr_ = -1, int klass_ = -1, std::string name_ = "", std::vector<int> categories_ ={}, Node* left_ = nullptr,Node* right_ = nullptr,Node* parent_ = nullptr ){
     this->id = id_;
