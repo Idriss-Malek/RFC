@@ -12,9 +12,12 @@ class DataFrame {
 public:
     vector<vector<double>> data;
     vector<Feature> features;
+    vector<double> klass;
 
     DataFrame(vector<vector<double>> data);
     DataFrame();
+
+    vector<double>& operator[](int index);
 
     vector<double> getRow(int index);
     void addRow(vector<double>);
@@ -22,4 +25,4 @@ public:
 
 };
 
-DataFrame read_csv(std::string file);
+DataFrame read_csv(std::string file, bool feat_included=false);

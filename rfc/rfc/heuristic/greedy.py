@@ -39,7 +39,7 @@ class GreedyCompressor:
         if self.p[id][klass] >= self.p[id][1-klass]+ eps * klass:
             return True
 
-    def solve(self,iterations=100):
+    def solve(self,iterations=1):
         for _ in range(iterations):
             u = np.ones(len(self.ensemble))
             p = self.p.copy()
@@ -48,8 +48,8 @@ class GreedyCompressor:
             for t in idx:
                 self.accur(t)
             idx.sort(key = lambda id:self.accs[id])
-            for i in range(len(self.ensemble)):
-                for j in range(len(self.ensemble)):
+            for i in idx:
+                for j in idx:
                     if i != j and u[i] + u[j] == 2:
                         T=[self.ensemble[i], self.ensemble[j]]
                         pp = []
@@ -75,9 +75,9 @@ class GreedyCompressor:
                     p -= pp
                 if sum(u) < sum(self.u):
                     self.u = u
-            
-            
-    
+                
+                
+        
         
 
 

@@ -4,16 +4,18 @@
 #include "../include/feature.hpp"
 #include "../include/tree.hpp"
 
-Node::Node(int id_,Feature* feature_ = nullptr, float thr_ = -1, int klass_ = -1, std::string name_ = "", std::vector<int> categories_ ={}, Node* left_ = nullptr,Node* right_ = nullptr,Node* parent_ = nullptr ){
+Node::Node(int id_,Feature* feature_ = nullptr, float thr_ = -1, int klass_ = -1, std::string name_ = "", Node* left_ = nullptr,Node* right_ = nullptr ){
     this->id = id_;
     this->name = name_.empty() ? "Node " + std::to_string(id_) : name;
     this->feature = feature_;
     this->thr = thr_;
     this->klass = klass_;
-    this->categories = categories_;
     this->left=left_;
     this->right = right_;
-    this->parent = parent_;
+}
+
+Node::Node(int id_){
+    this->id = id_;
 }
 
 void Node::setLeft(Node* left_){
@@ -50,7 +52,7 @@ bool Node::is_leaf(){
 }
 
 bool Node::goes_to_left(double value){
-    if (this->is_leaf()){
+    if (!this->is_leaf()){
         if (this->feature->isnumerical()){
             return static_cast<float>(value) <= this->thr;
         }

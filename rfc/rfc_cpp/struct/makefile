@@ -14,7 +14,7 @@ OBJ = $(SRC:.cpp=.o)
 BUILD = build
 
 # Fichier exécutable
-EXE = MonProjet
+EXE = main
 
 # Règles de compilation
 $(EXE) : $(OBJ)

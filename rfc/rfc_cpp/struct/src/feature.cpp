@@ -9,6 +9,7 @@ Feature::Feature(int id_, FeatureType type_, std::string name = "") {
     this->type = type_;
 }
 
+
 bool Feature::isnumerical() {
     return this->type == FeatureType::NUMERICAL;
 }

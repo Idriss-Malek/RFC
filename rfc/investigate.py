@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import pathlib
+import random as rd
 
 from rfc.model import Compressor,Separator,RFC
 from rfc.utils import load_tree_ensemble
@@ -11,7 +12,7 @@ comp = lambda x,y : x<y
 
 if __name__ == '__main__':
     root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
-    for word in ['HTRU2']:
+    for word in ['FICO']:
         for i in range (1,2):
             dataset = root / f'datasets/{word}/{word}.train{i}.csv'
             test_dataset = root / f'datasets/{word}/{word}.test{i}.csv'
@@ -22,7 +23,15 @@ if __name__ == '__main__':
             test_dataset = pd.read_csv(test_dataset)
             ensemble = str(ensemble)
             ensemble = load_tree_ensemble(ensemble, log_output=False)
-            compressor = Compressor(ensemble,dataset)
+            for i, row in dataset.iterrows():
+                if i==100:
+                    break
+                print(ensemble.p(row.to_numpy()))
+                
+                
+
+
+            """compressor = Compressor(ensemble,dataset)
             compressor.build()
             compressor.solve()
             with open('investigate.csv', 'a+') as f:
@@ -33,4 +42,4 @@ if __name__ == '__main__':
                 for t,tree in idenumerate(ensemble):
                     s+=f',{tree.klass(row)}'#type:ignore
                 with open('investigate.csv', 'a+') as f:
-                    f.write(s+'\n')
+                    f.write(s+'\n')"""

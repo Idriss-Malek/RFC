@@ -24,7 +24,12 @@ void DataFrame::addRow(std::vector<double> row){
     this->data.push_back(row);
 }
 
-DataFrame read_csv(std::string file_){
+vector<double>& DataFrame::operator[](int index){
+    return this->data[index];
+}
+
+
+DataFrame read_csv(std::string file_, bool feat_included){
     std::ifstream file(file_);
     DataFrame data;
     std::string line;
@@ -42,7 +47,7 @@ DataFrame read_csv(std::string file_){
             }
 
         
-        else if (line_nbr == 1){
+        else if (line_nbr == 1 and feat_included ){
             line_nbr++;
             std::istringstream ss(line);
             std::string field;
@@ -70,9 +75,13 @@ DataFrame read_csv(std::string file_){
         }
         data.addRow(fields);}
     }
+    for (int i = 0; i < data.data.size(); ++i){
+        data.klass.push_back(data.data[i].back());
+        data.data[i].pop_back();
+    }
     return data;
 }
-
+/*
 int main(){
     DataFrame data = read_csv("test.csv");
     for (int i = 0; i < data.features.size(); ++i) {
@@ -84,5 +93,9 @@ int main(){
         }
         std::cout<<std::endl;
     }
+    for (int j = 0; j< data.klass.size(); ++j) {
+            std::cout << "klass " << data.klass[j] << " ";
+        }
     return 0;
 }
+*/

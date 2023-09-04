@@ -34,7 +34,7 @@ public:
     void setCategories(std::vector<int> categories_);
 
     friend std::ostream& operator<<(std::ostream& os, const Feature& obj) {
-    os << "Feature : " << obj.name;
+    os << "Feature "<<obj.id<<" : " << obj.name;
     return os;
     }
 
