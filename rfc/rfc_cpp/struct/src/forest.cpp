@@ -16,6 +16,8 @@ Forest::Forest(std::vector<Tree> trees, std::vector<double> weights, int n_class
     this->n_classes = n_classes;
 }
 
+Forest::Forest(){}
+
 Forest::Forest(std::string rf ){
     std::vector<Feature> features;
     int n_classes;

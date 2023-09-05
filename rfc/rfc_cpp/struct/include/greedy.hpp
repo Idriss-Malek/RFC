@@ -3,6 +3,7 @@
 #include "forest.hpp"
 #include "dataframe.hpp"
 #include <Eigen/Dense>
+#include <chrono>
 
 Eigen::VectorXi probs_to_class(Eigen::MatrixXi probs);
 
@@ -14,8 +15,10 @@ public:
     Eigen::VectorXi def_klass;
     std::vector<int> u;
 
-    Greedy(DataFrame df_, Forest forest_);
 
-    void compress(int iter = 100);
+    Greedy(DataFrame df_, Forest forest_);
+    Greedy();
+
+    void compress(int iter = 100, int tuple = 1);
 };
 

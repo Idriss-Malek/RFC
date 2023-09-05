@@ -20,6 +20,7 @@ public:
 
     Forest(std::vector<Tree> trees, std::vector<double> weights, int n_classes);
     Forest(std::string rf);
+    Forest();
 
     Eigen::VectorXi distribution(std::vector<double> x);
 
