@@ -39,6 +39,8 @@ COMPAS-ProPublica 7,100,5,39,0.969153 s,11,7.11745 s,9,28.9962 s
 COMPAS-ProPublica 8,100,5,29,0.969764 s,9,8.49805 s,8,103.655 s
 COMPAS-ProPublica 9,100,5,19,0.968426 s,6,4.48909 s,7,10.2884 s
 COMPAS-ProPublica 10,100,7,45,0.970626 s,11,8.85053 s,9,48.9549 s
+
+deleting 2 or 1 trees at once, 96 random order for each forest
 FICO 1,100,39,1169.94 s 
 FICO 2,100,32,919.791 s 
 FICO 3,100,16,393.738 s 
