@@ -131,7 +131,7 @@ int main(int argc, char* argv[]){
 
     std::vector<std::thread> threads;
     for (int i=0;i<8; i++){
-        threads.push_back(std::thread(&Greedy::compress, &greedy, 1, tuple));
+        threads.push_back(std::thread(&Greedy::compress, &greedy, 12, tuple));
     }
     for (std::thread& t : threads) {
         t.join();
