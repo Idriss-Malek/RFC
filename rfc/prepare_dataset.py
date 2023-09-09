@@ -63,7 +63,7 @@ def exportTreeCollection(datasetName, ensemble, runcount, numFeatures, numClasse
     maxTreeDepth = []
     for tree in range(len(n_nodes)):
         maxTreeDepth.append(max(node_depth[tree]))
-    with open(str(rf_dir / datasetName / datasetName) +'.little'+ ".{}{}.txt".format(ensemble,runcount),"w+") as f:
+    with open(str(rf_dir / datasetName / datasetName) +'.BIG'+ ".{}{}.txt".format(ensemble,runcount),"w+") as f:
         f.write("DATASET_NAME: " + datasetName.split('/')[-1] + ".train{}.csv\n".format(runcount))
         f.write("ENSEMBLE: " + ensemble +"\n")
         f.write("NB_TREES: %s\n" %(len(n_nodes)))
@@ -221,4 +221,7 @@ def process_dataset(dataset, numOfTrees, treeDepth, numOfRuns):
 ################################################################################
 #main(sys.argv[1],sys.argv[2],sys.argv[3], sys.argv[4])
 if __name__ == '__main__':
-    globals()[sys.argv[1]](sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+    #globals()[sys.argv[1]](sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+    words=['FICO','HTRU2','Pima-Diabetes','COMPAS-ProPublica','Breast-Cancer-Wisconsin','Seeds']
+    for word in words:
+        process_dataset(word,1000,4,10)

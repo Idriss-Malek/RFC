@@ -116,7 +116,7 @@ int main(int argc, char* argv[]){
     int i = std::atoi(argv[2]);
     int tuple = std::atoi(argv[3]);
     std::stringstream ss;
-    ss << "/home/idrmal/RFC/resources/forests/" << word<<"/"<<word<<".RF"<<i<<".txt";
+    ss << "/home/idrmal/RFC/resources/forests/" << word<<"/"<<word<<".BIG.RF"<<i<<".txt";
     std::string rf_name = ss.str();
     Forest rf_(rf_name);
     ss.str("");
