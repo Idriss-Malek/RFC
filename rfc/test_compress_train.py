@@ -11,7 +11,7 @@ with open('test_compression_train_only_1000.csv', 'a+') as f:
 
 if __name__ == '__main__':
     root = pathlib.Path(__file__).parent.resolve().parent.resolve() / 'resources'
-    for word in ['FICO', 'HTRU2','Pima-Diabetes','COMPAS-ProPublica','Breast-Cancer-Wisconsin','Seeds']:
+    for word in ['Adult-Income']:
         for i in range (1,11):
             dataset = root / f'datasets/{word}/{word}.train{i}.csv'
             test_dataset = root / f'datasets/{word}/{word}.test{i}.csv'
